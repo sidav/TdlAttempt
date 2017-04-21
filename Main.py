@@ -1,68 +1,34 @@
-import tdl
-
-# actual size of the window
-SCREEN_WIDTH = 80
-SCREEN_HEIGHT = 25
-
-LIMIT_FPS = 20  # 20 frames-per-second maximum
-
-def handle_keys():
-    global playerx, playery
-
-    '''
-    #realtime
-
-    keypress = False
-    for event in tdl.event.get():
-        if event.type == 'KEYDOWN':
-           user_input = event
-           keypress = True
-    if not keypress:
-        return
-    '''
-
-    # turn-based
-    user_input = tdl.event.key_wait()
-
-    if user_input.key == 'ENTER' and user_input.alt:
-        # Alt+Enter: toggle fullscreen
-        tdl.set_fullscreen(True)
-
-    elif user_input.key == 'ESCAPE':
-        return True  # exit game
-
-    # movement keys
-    if user_input.key == 'UP':
-        playery -= 1
-
-    elif user_input.key == 'DOWN':
-        playery += 1
-
-    elif user_input.key == 'LEFT':
-        playerx -= 1
-
-    elif user_input.key == 'RIGHT':
-        playerx += 1
-
-#############################################
-# Initialization & Main Loop                #
-#############################################
-
-tdl.set_font('terminal8x12_gs_ro.png', greyscale=True, altLayout=False)
-console = tdl.init(SCREEN_WIDTH, SCREEN_HEIGHT, title="Roguelike", fullscreen= False, renderer= "SDL")
-tdl.setFPS(LIMIT_FPS)
+#import tdl
+from ConsoleWrapper import *
+from SidavRandom import *
 
 playerx = SCREEN_WIDTH // 2
 playery = SCREEN_HEIGHT // 2
 
+def keys():
+    global playerx, playery
+    keypressed = readKey()
+    if (keypressed.key == 'ESCAPE'): return True
+    if (keypressed.key == 'UP') or (keypressed.key == 'NUM8'): playery -= 1
+    if (keypressed.key == 'DOWN'): playery += 1
+    if (keypressed.key == 'LEFT'): playerx -= 1
+    if (keypressed.key == 'RIGHT'): playerx += 1
+
+
+i = 127
+
 while not tdl.event.is_window_closed():
-
-    console.draw_char(playerx, playery, '@', bg=None, fg=(255, 255, 255))
+    setForegroundColor(rand(256), rand(256), rand(256))
+    string = "Look at my fucking console. Look. "
+    for y in range(SCREEN_HEIGHT):
+        for x in range (SCREEN_WIDTH):
+            setForegroundColor(rand(256), rand(256), rand(256))
+            putChar(string[(x+y)%len(string)], x, y)
+            tdl.flush()
+    putChar("@", playerx, playery)
     tdl.flush()
-
-    console.draw_char(playerx, playery, ' ', bg=None)
-
+    putChar(" ", playerx, playery)
     # handle keys and exit game if needed
-    exit_game = handle_keys()
+    exit_game = keys()
     if exit_game:
         break
