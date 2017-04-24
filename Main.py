@@ -8,8 +8,8 @@ playery = SCREEN_HEIGHT // 2
 def keys():
     global playerx, playery
     keypressed = readKey()
-    if (keypressed.key == 'ESCAPE'): return True
-    if (keypressed.key == 'UP') or (keypressed.key == 'NUM8'): playery -= 1
+    if (keypressed.key == 'ESCAPE') or (keypressed.key == 'ESCAPE'): return True
+    if (keypressed.key == 'UP') or (keypressed.key == 'KP8'): playery -= 1
     if (keypressed.key == 'DOWN'): playery += 1
     if (keypressed.key == 'LEFT'): playerx -= 1
     if (keypressed.key == 'RIGHT'): playerx += 1
@@ -24,7 +24,7 @@ while not tdl.event.is_window_closed():
         for x in range (SCREEN_WIDTH):
             setForegroundColor(rand(256), rand(256), rand(256))
             putChar(string[(x+y)%len(string)], x, y)
-            tdl.flush()
+            #tdl.flush()
     putChar("@", playerx, playery)
     tdl.flush()
     putChar(" ", playerx, playery)
