@@ -15,21 +15,24 @@ def keys():
     if (keypressed.key == 'LEFT'): playerx -= 1
     if (keypressed.key == 'RIGHT'): playerx += 1
 
+def mainLoop():
+    while not tdl.event.is_window_closed():
+        setForegroundColor(rand(256), rand(256), rand(256))
+        string = "Look at my fucking console. Look. "
+        # for y in range(SCREEN_HEIGHT):
+        #     for x in range (SCREEN_WIDTH):
+        #         setForegroundColor(rand(256), rand(256), rand(256))
+        #         putChar(string[(x+y)%len(string)], x, y)
+        #         #tdl.flush()
+        putChar("@", playerx, playery)
+        tdl.flush()
+        # putChar(" ", playerx, playery)
+        # handle keys and exit game if needed
+        keys()
+        if exit_game:
+            break
+
 
 i = 127
 
-while not tdl.event.is_window_closed():
-    setForegroundColor(rand(256), rand(256), rand(256))
-    string = "Look at my fucking console. Look. "
-    # for y in range(SCREEN_HEIGHT):
-    #     for x in range (SCREEN_WIDTH):
-    #         setForegroundColor(rand(256), rand(256), rand(256))
-    #         putChar(string[(x+y)%len(string)], x, y)
-    #         #tdl.flush()
-    putChar("@", playerx, playery)
-    tdl.flush()
-    # putChar(" ", playerx, playery)
-    # handle keys and exit game if needed
-    keys()
-    if exit_game:
-        break
+mainLoop()
