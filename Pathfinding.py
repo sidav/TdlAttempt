@@ -42,7 +42,7 @@ class Pathfinder:
         return False
 
     def boolmapToNodemap(self):
-        #firstly, let's make nodes array from sumpru bool array
+        #firstly, let's make nodes array from simpru bool array
         for x in range(len(self.boolmap)):
             for y in range(len(self.boolmap[0])):
                 isPassable = self.boolmap[x][y]

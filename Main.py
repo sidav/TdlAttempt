@@ -1,6 +1,8 @@
 #import tdl
 from ConsoleWrapper import *
 from SidavRandom import *
+#DELETE FOLLOWING AFTER DEBUG:
+from SimplePathfinding import *
 
 playerx = SCREEN_WIDTH // 2
 playery = SCREEN_HEIGHT // 2
@@ -34,5 +36,11 @@ def mainLoop():
 
 
 i = 127
+#UNCOMMENT THE FOLLOWING LINE FOR THE TDL USE:
+#mainLoop()
 
-mainLoop()
+#DELETE THE FOLLOWING AFTER THE DEBUG:
+boolmap = [[0] * 5 for _ in range(5)]
+shit = CrapPathfinding(boolmap, 0, 2, 4, 3)
+crapPath = shit.findPath()
+input(None)
