@@ -1,5 +1,6 @@
 #There I'll try to implement "Simple pathfinding for a dungeon" by Pieter Droogendijk.
 #It should be simple as crap, but it isn't.
+#It is almost finished (it works at least), but it needs some cosmetic work.
 class cell:
     def __init__(self, x, y, passabru, value):
         self.x = x
@@ -33,15 +34,12 @@ class cellStack:
 
 class CrapPathfinding:
 
-    def debugprint(self, s):
-        print(s)
-
     def coordsValid(self, x, y):
         if 0 <= x < len(self.boolmap) and 0 <= y < len(self.boolmap[0]):
             return True
         return False
 
-    def selectReversePath(self):
+    def selectNextInPath(self):
         x = self.currentCell.x
         y = self.currentCell.y
         for i in (-1, 0, 1):
@@ -52,7 +50,7 @@ class CrapPathfinding:
                         return selectedSquare
         return None #There isn't any adjacent squares which value is by 1 less than needed.
 
-    def selectAdjacentZeroSquare(self):
+    def selectAdjacentZeroValueSquare(self):
         x = self.currentCell.x
         y = self.currentCell.y
         for i in (-1, 0, 1):
@@ -71,7 +69,7 @@ class CrapPathfinding:
         while not goto7:
             #steps 2-4
             while True:
-                selectedSquare = self.selectAdjacentZeroSquare()
+                selectedSquare = self.selectAdjacentZeroValueSquare()
                 if selectedSquare is None:
                     break
                 if selectedSquare == self.target:
@@ -79,13 +77,18 @@ class CrapPathfinding:
                     goto7 = True
                     break
                 self.unfinished.push(selectedSquare)
+            if (goto7):
+                break
             #step 5
             self.currentCell = self.unfinished.shift()
-            #step 6 is "goto step 2", so goto step 2.
-        #it's a step 7 now, i fear. Target is now the current square.
+            if self.currentCell == None:
+                print("No way exists!")
+                return self.finalReversedPath
+            #step 6 is "virtual": it's just "goto step 2", so no code there.
+        #Step 7 should be virtually done now, i fear. Target is now the current square.
         #steps 8-11:
         while True:
-            selectedSquare = self.selectReversePath()
+            selectedSquare = self.selectNextInPath()
             self.finalReversedPath.append(self.currentCell)
             self.currentCell = selectedSquare
             if self.currentCell == self.origin:
