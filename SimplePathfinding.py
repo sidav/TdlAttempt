@@ -16,16 +16,25 @@ class cellStack:
         self.stack.append(crap)
 
     def pop(self):
+        if len(self.stack) == 0:
+            print("pop is fucked up.")
+            return None
         ret = self.stack[len(self.stack)-1]
         self.stack.remove(ret)
         return ret
 
     def shift(self):
+        if len(self.stack) == 0:
+            print("shift is fucked up.")
+            return None
         ret = self.stack[0]
         self.stack.remove(ret)
         return ret
 
 class CrapPathfinding:
+
+    def debugprint(self, s):
+        print(s)
 
     def coordsValid(self, x, y):
         if 0 <= x < len(self.boolmap) and 0 <= y < len(self.boolmap[0]):
@@ -65,7 +74,7 @@ class CrapPathfinding:
                 selectedSquare = self.selectAdjacentZeroSquare()
                 if selectedSquare is None:
                     break
-                if selectedSquare is self.target:
+                if selectedSquare == self.target:
                     self.currentCell = selectedSquare
                     goto7 = True
                     break
@@ -91,6 +100,7 @@ class CrapPathfinding:
         y = len(inpboolmap[0])
         self.boolmap = inpboolmap #if true, then the given cell is passabru!
         self.unfinished = cellStack()
+        self.finalReversedPath = []
         self.cellmap = [[0] * y for _ in range(x)]
         for i in range(x):
             for j in range(y):

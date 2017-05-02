@@ -1,11 +1,12 @@
 #import tdl
-from ConsoleWrapper import *
+#UNCOMMENT THE FOLLOWING LINE FOR THE TDL USE:
+#from ConsoleWrapper import *
 from SidavRandom import *
 #DELETE FOLLOWING AFTER DEBUG:
 from SimplePathfinding import *
 
-playerx = SCREEN_WIDTH // 2
-playery = SCREEN_HEIGHT // 2
+#playerx = SCREEN_WIDTH // 2
+#playery = SCREEN_HEIGHT // 2
 exit_game = False
 
 def keys():
@@ -40,7 +41,17 @@ i = 127
 #mainLoop()
 
 #DELETE THE FOLLOWING AFTER THE DEBUG:
-boolmap = [[0] * 5 for _ in range(5)]
-shit = CrapPathfinding(boolmap, 0, 2, 4, 3)
+boolmap = [[1] * 5 for _ in range(5)]
+boolmap[1][4] = 0
+boolmap[1][3] = 0
+boolmap[1][2] = 0
+boolmap[1][1] = 0
+boolmap[3][0] = 0
+boolmap[3][1] = 0
+boolmap[3][2] = 0
+print(boolmap)
+shit = CrapPathfinding(boolmap, 0, 4, 4, 1)
 crapPath = shit.findPath()
-input(None)
+print("PATH IS:")
+for i in crapPath:
+    print(str(i.x) + " " + str(i.y))
