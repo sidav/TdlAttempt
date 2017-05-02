@@ -34,6 +34,11 @@ class cellStack:
 
 class CrapPathfinding:
 
+    def abs(self, t):
+        if t < 0:
+            return -t
+        return t
+
     def coordsValid(self, x, y):
         if 0 <= x < len(self.boolmap) and 0 <= y < len(self.boolmap[0]):
             return True
@@ -55,7 +60,7 @@ class CrapPathfinding:
         y = self.currentCell.y
         for i in (-1, 0, 1):
             for j in (-1, 0, 1):
-                if self.coordsValid(x+i, y+j) and (i != 0 or j != 0):
+                if self.coordsValid(x+i, y+j) and (i != 0 or j != 0) and (self.diagonalsAllowed or abs(i) + abs(j) != 2):
                     if self.cellmap[x+i][y+j].value == 0 and self.cellmap[x+i][y+j].passable and self.cellmap[x+i][y+j] != self.origin:
                         selectedSquare = self.cellmap[x+i][y+j] #yep, we have selected that one.
                         selectedSquare.value = self.currentCell.value + 1
@@ -102,7 +107,8 @@ class CrapPathfinding:
 
 
 
-    def __init__(self, inpboolmap, fromx, fromy, tox, toy):
+    def __init__(self, inpboolmap, fromx, fromy, tox, toy, allowDiags = True):
+        self.diagonalsAllowed = allowDiags
         x = len(inpboolmap)
         y = len(inpboolmap[0])
         self.boolmap = inpboolmap #if true, then the given cell is passabru!

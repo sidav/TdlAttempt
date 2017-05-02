@@ -54,7 +54,7 @@ def mainLoop():
     # boolmap[7][5] = 0
     # boolmap[8][1] = 0
     # boolmap[8][4] = 0
-    shit = CrapPathfinding(boolmap, fx, fy, tx, ty)
+    shit = CrapPathfinding(boolmap, fx, fy, tx, ty, False)
     crapPath = shit.findPath()
     while not tdl.event.is_window_closed():
         setForegroundColor(128, 128, 128)
