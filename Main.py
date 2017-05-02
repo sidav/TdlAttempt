@@ -1,6 +1,5 @@
 #import tdl
-#UNCOMMENT THE FOLLOWING LINE FOR THE TDL USE:
-#from ConsoleWrapper import *
+from ConsoleWrapper import *
 from SidavRandom import *
 #DELETE FOLLOWING AFTER DEBUG:
 from SimplePathfinding import *
@@ -19,15 +18,65 @@ def keys():
     if (keypressed.key == 'RIGHT'): playerx += 1
 
 def mainLoop():
+    x = 9
+    y = 9
+    fx = 5
+    fy = 0
+    tx = 5
+    ty = 6
+    #boolmap = [[1] * y for _ in range(x)]
+    boolmap = [
+        [1, 1, 1, 0, 1, 1, 1],
+        [1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 1, 1, 1, 0, 1]
+    ]
+    # boolmap[0][3] = 0
+    # boolmap[0][6] = 0
+    # boolmap[1][3] = 0
+    # boolmap[2][2] = 0
+    # boolmap[2][7] = 0
+    # boolmap[2][8] = 0
+    # boolmap[3][3] = 0
+    # boolmap[3][4] = 0
+    # boolmap[3][5] = 0
+    # boolmap[4][4] = 0
+    # boolmap[4][4] = 0
+    # boolmap[4][6] = 0
+    # boolmap[4][7] = 0
+    # boolmap[5][6] = 0
+    # boolmap[6][4] = 0
+    # boolmap[6][6] = 0
+    # boolmap[7][2] = 0
+    # boolmap[7][3] = 0
+    # boolmap[7][5] = 0
+    # boolmap[8][1] = 0
+    # boolmap[8][4] = 0
+    shit = CrapPathfinding(boolmap, fx, fy, tx, ty)
+    crapPath = shit.findPath()
     while not tdl.event.is_window_closed():
-        setForegroundColor(rand(256), rand(256), rand(256))
-        string = "Look at my fucking console. Look. "
-        # for y in range(SCREEN_HEIGHT):
-        #     for x in range (SCREEN_WIDTH):
-        #         setForegroundColor(rand(256), rand(256), rand(256))
-        #         putChar(string[(x+y)%len(string)], x, y)
-        #         #tdl.flush()
-        putChar("@", playerx, playery)
+        setForegroundColor(128, 128, 128)
+        for i in range(len(boolmap)+2):
+            for j in range(len(boolmap[0])+2):
+                putChar("#", i, 0)
+                putChar("#", i, len(boolmap[0])+1)
+                putChar("#", 0, j)
+                putChar("#", len(boolmap)+1, j)
+        setForegroundColor(255, 255, 255)
+        for i in range(len(boolmap)):
+            for j in range(len(boolmap[0])):
+                if not boolmap[i][j]:
+                    putChar("#", i+1, j+1)
+        setForegroundColor(255,0,0)
+        for i in crapPath:
+            putChar("*", i.x+1, i.y+1)
+        setForegroundColor(0, 0, 255)
+        putChar("@", fx+1, fy+1)
+        setForegroundColor(0, 255, 255)
+        putChar("T", tx+1, ty+1)
+        #SHIT ENDS HERE.
         tdl.flush()
         # putChar(" ", playerx, playery)
         # handle keys and exit game if needed
@@ -37,43 +86,4 @@ def mainLoop():
 
 
 i = 127
-#UNCOMMENT THE FOLLOWING LINE FOR THE TDL USE:
-#mainLoop()
-
-#DELETE THE FOLLOWING AFTER THE DEBUG:
-boolmap = [[1] * 3 for _ in range(3)]
-boolmap = [
-    [1,1,1,1,1],
-    [1,1,1,1,1],
-    [1,1,1,1,1],
-    [1,1,0,1,1],
-    [1,1,1,1,1],
-]
-boolmap = [[1] * 9 for _ in range(9)]
-boolmap[0][3] = 0
-boolmap[0][6] = 0
-boolmap[1][3] = 0
-boolmap[2][2] = 0
-boolmap[2][7] = 0
-boolmap[2][8] = 0
-boolmap[3][3] = 0
-boolmap[3][4] = 0
-boolmap[3][5] = 0
-boolmap[4][4] = 0
-boolmap[4][4] = 0
-boolmap[4][6] = 0
-boolmap[4][7] = 0
-boolmap[5][6] = 0
-boolmap[6][4] = 0
-boolmap[6][6] = 0
-boolmap[7][2] = 0
-boolmap[7][3] = 0
-boolmap[7][5] = 0
-boolmap[8][1] = 0
-boolmap[8][4] = 0
-print(boolmap)
-shit = CrapPathfinding(boolmap, 0, 8, 8, 2)
-crapPath = shit.findPath()
-print("PATH IS:")
-for i in crapPath:
-    print(str(i.x) + " " + str(i.y))
+mainLoop()

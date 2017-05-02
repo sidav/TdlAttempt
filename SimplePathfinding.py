@@ -63,6 +63,10 @@ class CrapPathfinding:
         return None #There isn't any adjacent squares with zero value
 
     def findPath(self):
+        #some pre-checks:
+        if not self.target.passable:
+            print("Target square is non-passable!")
+            return self.finalReversedPath
         #step 1 is missing (it is in the constructor)
         goto7 = False
         #next loop is from step 6

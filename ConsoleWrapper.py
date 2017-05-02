@@ -18,8 +18,7 @@ def putChar(char, x, y):
 
 
 def putString(string, x, y):
-    for i in range (len(string)):
-        putChar(string[i], x+i, y)
+    console.draw_str(x, y, string, bg=BACKCOLOR, fg=FORECOLOR)
 
 
 
