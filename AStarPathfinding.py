@@ -1,6 +1,4 @@
-  #Here I'll try to implement the A* pathfinding.
-  #Yes, it is a horrible shit.
-
+#A* pathfinding algorithm
 class cell:
 
     def getF(self):
@@ -18,33 +16,10 @@ class cell:
         if self.parent is not None:
             self.g = self.parent.g + inc
 
-class cellStack:
-
-    def __init__(self):
-        self.stack = []
-
-    def push(self, crap):
-        self.stack.append(crap)
-
-    def pop(self):
-        if len(self.stack) == 0:
-            print("pop is fucked up.")
-            return None
-        ret = self.stack[len(self.stack)-1]
-        self.stack.remove(ret)
-        return ret
-
-    def shift(self):
-        if len(self.stack) == 0:
-            print("shift is fucked up.")
-            return None
-        ret = self.stack[0]
-        self.stack.remove(ret)
-        return ret
-
 class AStarPathfinding:
 
     STRAIGHT_COST = 10
+    DIAGONAL_COST = 14
 
     def abs(self, t):
         if t < 0:
@@ -52,42 +27,37 @@ class AStarPathfinding:
         return t
 
     def coordsValid(self, x, y):
-        if 0 <= x < len(self.boolmap) and 0 <= y < len(self.boolmap[0]):
+        if 0 <= x < len(self.cellmap) and 0 <= y < len(self.cellmap[0]):
             return True
         return False
 
     def manhattanHeuristic(self, fromx, fromy, tox, toy):
         return 10*(self.abs(tox - fromx) + self.abs(toy - fromy))
 
-    # def selectAdjacentZeroValueSquare(self):
-    #     x = self.currentCell.x
-    #     y = self.currentCell.y
-    #     for i in (-1, 0, 1):
-    #         for j in (-1, 0, 1):
-    #             if self.coordsValid(x+i, y+j) and (i != 0 or j != 0) and (self.diagonalsAllowed or abs(i) + abs(j) != 2):
-    #                 if self.cellmap[x+i][y+j].value == 0 and self.cellmap[x+i][y+j].passable and self.cellmap[x+i][y+j] != self.origin:
-    #                     selectedSquare = self.cellmap[x+i][y+j] #yep, we have selected that one.
-    #                     selectedSquare.value = self.currentCell.value + 1
-    #                     return selectedSquare
-    #     return None #There isn't any adjacent squares with zero value
-
     def doNeighbours(self, curcell):
+        cost = 0
         x = curcell.x
         y = curcell.y
         for i in (-1, 0, 1):
             for j in (-1, 0, 1):
                 if self.coordsValid(x+i, y+j) and (i != 0 or j != 0):
+                    if i*j != 0: #if that neighbour lays diagonally...
+                        if not self.diagonalsAllowed:
+                            continue
+                        else:
+                            cost = self.DIAGONAL_COST
+                    else:
+                        cost = self.STRAIGHT_COST
                     curneighbour = self.cellmap[x + i][y + j]
                     if curneighbour.passable and curneighbour not in self.closedlist:
                         if curneighbour not in self.openlist:
                             self.openlist.append(curneighbour)
                             curneighbour.parent = curcell
-                            curneighbour.setG(self.STRAIGHT_COST) #STRAIGHT_COST is the cost of non-diagonal movement. We need to replace this shit
-                                                  #for the diagonal cases.
+                            curneighbour.setG(cost)
                         else: #Here be dragons. I didn't understand that part completely.
-                            if curneighbour.g > curcell.g + self.STRAIGHT_COST:
+                            if curneighbour.g > curcell.g + cost:
                                 curneighbour.parent = curcell
-                                curneighbour.setG(self.STRAIGHT_COST)
+                                curneighbour.setG(cost)
 
     def getLowestFCell(self):
         cheapestcell = self.openlist[0]
@@ -130,20 +100,24 @@ class AStarPathfinding:
                 self.makePath()
         return self.finalReversedPath
 
+    def getPathCost(self):
+        if len(self.finalReversedPath) > 0:
+            return self.finalReversedPath[0].g
+        else:
+            return -1  # error or something
 
 
     def __init__(self, inpboolmap, fromx, fromy, tox, toy, allowDiags = True):
         self.diagonalsAllowed = allowDiags
         x = len(inpboolmap)
         y = len(inpboolmap[0])
-        self.boolmap = inpboolmap #if true, then the given cell is passabru!
-        self.openlist = []#cellStack()
-        self.closedlist = []#cellStack()
+        self.openlist = []
+        self.closedlist = []
         self.finalReversedPath = []
         self.cellmap = [[0] * y for _ in range(x)]
         for i in range(x):
             for j in range(y):
-                self.cellmap[i][j] = cell(i, j, self.boolmap[i][j], h = self.manhattanHeuristic(i, j, tox, toy))
+                self.cellmap[i][j] = cell(i, j, inpboolmap[i][j], h=self.manhattanHeuristic(i, j, tox, toy))
         self.target = self.cellmap[tox][toy]
         self.origin = self.cellmap[fromx][fromy]
         #self.currentCell = self.origin

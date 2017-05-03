@@ -21,18 +21,18 @@ def keys():
 def mainLoop():
     x = 9
     y = 9
-    fx = 5
-    fy = 0
-    tx = 5
-    ty = 6
+    fx = 2
+    fy = 2
+    tx = 3
+    ty = 5
     #boolmap = [[1] * y for _ in range(x)]
     boolmap = [
+        [1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1, 1, 1],
         [1, 1, 1, 0, 1, 1, 1],
-        [1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 1, 1, 1, 0, 1]
+        [1, 1, 1, 0, 1, 1, 1],
+        [1, 0, 0, 0, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1]
     ]
     # boolmap[0][3] = 0
     # boolmap[0][6] = 0
@@ -55,7 +55,7 @@ def mainLoop():
     # boolmap[7][5] = 0
     # boolmap[8][1] = 0
     # boolmap[8][4] = 0
-    shit = AStarPathfinding(boolmap, fx, fy, tx, ty)
+    shit = AStarPathfinding(boolmap, fx, fy, tx, ty, allowDiags=True)
     crapPath = shit.findPath()
     while not tdl.event.is_window_closed():
         setForegroundColor(128, 128, 128)
@@ -77,6 +77,7 @@ def mainLoop():
         putChar("@", fx+1, fy+1)
         setForegroundColor(0, 255, 255)
         putChar("T", tx+1, ty+1)
+        putString("Path cost = " + str(shit.getPathCost()), 20, 0)
         #SHIT ENDS HERE.
         tdl.flush()
         # putChar(" ", playerx, playery)
