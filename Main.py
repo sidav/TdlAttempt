@@ -3,6 +3,7 @@ from ConsoleWrapper import *
 from SidavRandom import *
 #DELETE FOLLOWING AFTER DEBUG:
 from SimplePathfinding import *
+from AStarPathfinding import *
 
 #playerx = SCREEN_WIDTH // 2
 #playery = SCREEN_HEIGHT // 2
@@ -54,7 +55,7 @@ def mainLoop():
     # boolmap[7][5] = 0
     # boolmap[8][1] = 0
     # boolmap[8][4] = 0
-    shit = CrapPathfinding(boolmap, fx, fy, tx, ty, False)
+    shit = AStarPathfinding(boolmap, fx, fy, tx, ty)
     crapPath = shit.findPath()
     while not tdl.event.is_window_closed():
         setForegroundColor(128, 128, 128)
