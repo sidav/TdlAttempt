@@ -1,5 +1,5 @@
 import tdl
-
+from BresenhamLine import *
 
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 25
@@ -21,6 +21,11 @@ def putString(string, x, y):
     console.draw_str(x, y, string, bg=BACKCOLOR, fg=FORECOLOR)
 
 
+def drawLine(x0, y0, x1, y1):
+    line = get_line(x0, y0, x1, y1)
+    for i in line:
+        putChar("#", i.x, i.y)
+
 
 def setBackgroundColor(r, g, b):
     global BACKCOLOR
@@ -38,7 +43,7 @@ def flushConsole():
 
 
 def clearConsole():
-    console.clear(bg = none, fg = (0, 0, 0))
+    console.clear(bg = (0, 0, 0), fg = (0, 0, 0))
 
 
 def readKey():

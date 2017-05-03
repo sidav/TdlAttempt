@@ -5,17 +5,22 @@ from SidavRandom import *
 from SimplePathfinding import *
 from AStarPathfinding import *
 
-#playerx = SCREEN_WIDTH // 2
-#playery = SCREEN_HEIGHT // 2
+playerx = SCREEN_WIDTH // 2
+playery = SCREEN_HEIGHT // 2
 exit_game = False
+crapx = []
+crapy = []
 
 def keys():
-    global playerx, playery, exit_game
+    global playerx, playery, crapx, crapy, exit_game
     keypressed = readKey()
     if (keypressed.key == 'ESCAPE') or (keypressed.key == 'ESCAPE'): exit_game = True
     if (keypressed.key == 'UP') or (keypressed.key == 'KP8'): playery -= 1
     if (keypressed.key == 'DOWN'): playery += 1
     if (keypressed.key == 'LEFT'): playerx -= 1
+    if (keypressed.key == 'SPACE'):
+        crapx.append(playerx)
+        crapy.append(playery)
     if (keypressed.key == 'RIGHT'): playerx += 1
 
 def mainLoop():
@@ -78,6 +83,12 @@ def mainLoop():
         setForegroundColor(0, 255, 255)
         putChar("T", tx+1, ty+1)
         putString("Path cost = " + str(shit.getPathCost()), 20, 0)
+        #####################################
+        clearConsole()
+        for i in range(len(crapx)):
+            drawLine(playerx, playery, crapx[i], crapy[i])
+        setForegroundColor(255, 64, 64)
+        putChar("@", playerx, playery)
         #SHIT ENDS HERE.
         tdl.flush()
         # putChar(" ", playerx, playery)
