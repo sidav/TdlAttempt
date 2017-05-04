@@ -14,9 +14,9 @@ def get_line(fromx, fromy, tox, toy):
     xmod = 1
     ymod = 1
     if tox < fromx:
-        xmod = -1;
+        xmod = -1
     if toy < fromy:
-        ymod = -1;
+        ymod = -1
     error = 0
     if deltax >= deltay:
         y = fromy
@@ -37,3 +37,25 @@ def get_line(fromx, fromy, tox, toy):
                 x = x + xmod
                 error -= deltay
     return line
+
+def get_circle(x0, y0, radius):
+    circle = []
+    x = radius
+    y = 0
+    radiusError = 1 - x
+    while (x >= y):
+        circle.append(xy(x + x0, y + y0))
+        # circle.append(xy(y + x0, x + y0))
+        # circle.append(xy(-x + x0, y + y0))
+        # circle.append(xy(-y + x0, x + y0))
+        # circle.append(xy(-x + x0, -y + y0))
+        # circle.append(xy(-y + x0, -x + y0))
+        # circle.append(xy(x + x0, -y + y0))
+        # circle.append(xy(y + x0, -x + y0))
+        y+=1
+        if (radiusError < 0):
+            radiusError += 2 * y + 1
+        else:
+            x-=1
+            radiusError += 2 * (y - x + 1)
+    return circle

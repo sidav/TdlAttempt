@@ -39,30 +39,9 @@ def mainLoop():
         [1, 0, 0, 0, 1, 1, 1],
         [1, 1, 1, 1, 1, 1, 1]
     ]
-    # boolmap[0][3] = 0
-    # boolmap[0][6] = 0
-    # boolmap[1][3] = 0
-    # boolmap[2][2] = 0
-    # boolmap[2][7] = 0
-    # boolmap[2][8] = 0
-    # boolmap[3][3] = 0
-    # boolmap[3][4] = 0
-    # boolmap[3][5] = 0
-    # boolmap[4][4] = 0
-    # boolmap[4][4] = 0
-    # boolmap[4][6] = 0
-    # boolmap[4][7] = 0
-    # boolmap[5][6] = 0
-    # boolmap[6][4] = 0
-    # boolmap[6][6] = 0
-    # boolmap[7][2] = 0
-    # boolmap[7][3] = 0
-    # boolmap[7][5] = 0
-    # boolmap[8][1] = 0
-    # boolmap[8][4] = 0
     shit = AStarPathfinding(boolmap, fx, fy, tx, ty, allowDiags=True)
     crapPath = shit.findPath()
-    while not tdl.event.is_window_closed():
+    while not tdl.event.is_window_closed(): # <--- not shit
         setForegroundColor(128, 128, 128)
         for i in range(len(boolmap)+2):
             for j in range(len(boolmap[0])+2):
@@ -87,6 +66,7 @@ def mainLoop():
         clearConsole()
         for i in range(len(crapx)):
             drawLine(playerx, playery, crapx[i], crapy[i])
+        drawCircle(playerx, playery, 7)
         setForegroundColor(255, 64, 64)
         putChar("@", playerx, playery)
         #SHIT ENDS HERE.

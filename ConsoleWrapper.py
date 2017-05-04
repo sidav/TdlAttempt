@@ -26,6 +26,10 @@ def drawLine(x0, y0, x1, y1):
     for i in line:
         putChar("#", i.x, i.y)
 
+def drawCircle(x0, y0, radius):
+    circle = get_circle(x0, y0, radius)
+    for i in circle:
+        putChar("#", i.x, i.y)
 
 def setBackgroundColor(r, g, b):
     global BACKCOLOR
