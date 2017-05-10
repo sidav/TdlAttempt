@@ -1,5 +1,6 @@
 #import tdl
 from ConsoleWrapper import *
+from BSPDungeonGenerator import doShit
 from SidavRandom import *
 #DELETE FOLLOWING AFTER DEBUG:
 from SimplePathfinding import *
@@ -24,51 +25,10 @@ def keys():
     if (keypressed.key == 'RIGHT'): playerx += 1
 
 def mainLoop():
-    x = 9
-    y = 9
-    fx = 2
-    fy = 2
-    tx = 3
-    ty = 5
-    #boolmap = [[1] * y for _ in range(x)]
-    boolmap = [
-        [1, 1, 1, 1, 1, 1, 1],
-        [1, 0, 0, 0, 1, 1, 1],
-        [1, 1, 1, 0, 1, 1, 1],
-        [1, 1, 1, 0, 1, 1, 1],
-        [1, 0, 0, 0, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1]
-    ]
-    shit = AStarPathfinding(boolmap, fx, fy, tx, ty, allowDiags=True)
-    crapPath = shit.findPath()
     while not tdl.event.is_window_closed(): # <--- not shit
-        setForegroundColor(128, 128, 128)
-        for i in range(len(boolmap)+2):
-            for j in range(len(boolmap[0])+2):
-                putChar("#", i, 0)
-                putChar("#", i, len(boolmap[0])+1)
-                putChar("#", 0, j)
-                putChar("#", len(boolmap)+1, j)
-        setForegroundColor(255, 255, 255)
-        for i in range(len(boolmap)):
-            for j in range(len(boolmap[0])):
-                if not boolmap[i][j]:
-                    putChar("#", i+1, j+1)
-        setForegroundColor(255,0,0)
-        for i in crapPath:
-            putChar("*", i.x+1, i.y+1)
-        setForegroundColor(0, 0, 255)
-        putChar("@", fx+1, fy+1)
-        setForegroundColor(0, 255, 255)
-        putChar("T", tx+1, ty+1)
-        putString("Path cost = " + str(shit.getPathCost()), 20, 0)
-        #####################################
         clearConsole()
-        for i in range(len(crapx)):
-            drawLine(playerx, playery, crapx[i], crapy[i])
-        drawCircle(playerx, playery, 7)
-        setForegroundColor(255, 64, 64)
-        putChar("@", playerx, playery)
+        doShit()
+        #drawRect(0,0,10,10)
         #SHIT ENDS HERE.
         tdl.flush()
         # putChar(" ", playerx, playery)
@@ -76,7 +36,6 @@ def mainLoop():
         keys()
         if exit_game:
             break
-
 
 i = 127
 mainLoop()

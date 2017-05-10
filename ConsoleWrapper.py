@@ -31,6 +31,14 @@ def drawCircle(x0, y0, radius):
     for i in circle:
         putChar("#", i.x, i.y)
 
+def drawRect(x0, y0, w, h):
+    for i in range(x0, x0+w):
+        putChar("#", i, y0)
+        putChar("#", i, y0+h-1)
+    for j in range(y0, y0+h):
+        putChar("#", x0, j)
+        putChar("#", x0+w-1, j)
+
 def setBackgroundColor(r, g, b):
     global BACKCOLOR
     BACKCOLOR = (r, g, b)
