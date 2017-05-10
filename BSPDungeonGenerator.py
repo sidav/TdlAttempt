@@ -93,7 +93,7 @@ def splitNTimes(N):
 
 def doShit(): #delete this somewhen
     global BSPRoot
-    con = Container(1,1,70,24)
+    con = Container(1,1,79,24)
     BSPRoot = treeNode(cont = con)
     splitNTimes(6)
     leafs = BSPRoot.getLeafs()
