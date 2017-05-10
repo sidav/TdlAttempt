@@ -37,22 +37,27 @@ class treeNode:
         return leafs
 
     def split(self): #BSP splitting
-        factor = random(MIN_SPLIT_FACTOR, MAX_SPLIT_FACTOR)
         selfx = self.cont.x
         selfy = self.cont.y
         selfw = self.cont.w
         selfh = self.cont.h
-        lefthorizh = selfh*factor//100
-        righthorizh = selfh - lefthorizh
-        leftvertw = selfw*factor//100
-        rightvertw = selfw - leftvertw
-        horiz = random(0, 1) #0 is horizontal splitting, 1 is vertical
-        if horiz == 0:
+        horiz = random(0, 1)  # 1 is horizontal splitting, 0 is vertical
+        for _ in range(5): #5 is just a number of tries
+            factor = random(MIN_SPLIT_FACTOR, MAX_SPLIT_FACTOR)
+            lefthorizh = selfh*factor//100
+            righthorizh = selfh - lefthorizh
+            leftvertw = selfw*factor//100
+            rightvertw = selfw - leftvertw
+            if not (lefthorizh > MIN_ROOM_SIZE and righthorizh > MIN_ROOM_SIZE):
+                horiz = 0
+            if not (leftvertw > MIN_ROOM_SIZE and rightvertw > MIN_ROOM_SIZE):
+                return
+        if horiz == 1: #horizontal split
             leftc = Container(selfx, selfy, selfw, lefthorizh, "LHORIZONTAL")
             rightc = Container(selfx, selfy+lefthorizh, selfw, righthorizh, "RHORIZONTAL")
             self.left = treeNode(self, leftc)
             self.right = treeNode(self, rightc)
-        else:
+        else: #vertical split
             leftc = Container(selfx, selfy, leftvertw, selfh, "LVERTICAL")
             rightc = Container(selfx+leftvertw, selfy, rightvertw, selfh, "RVERTICAL")
             self.left = treeNode(self, leftc)
@@ -84,7 +89,7 @@ def doShit(): #delete this somewhen
     global BSPRoot
     con = Container(1,1,70,24)
     BSPRoot = treeNode(cont = con)
-    splitNTimes(3)
+    splitNTimes(4)
     leafs = BSPRoot.getLeafs()
     # print("Level 0")
     # for i in BSPRoot.getLevel(0):
