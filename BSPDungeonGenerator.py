@@ -43,15 +43,21 @@ class treeNode:
         selfh = self.cont.h
         horiz = random(0, 1)  # 1 is horizontal splitting, 0 is vertical
         for _ in range(5): #5 is just a number of tries
+            horizOK = True
+            vertOK = True
             factor = random(MIN_SPLIT_FACTOR, MAX_SPLIT_FACTOR)
             lefthorizh = selfh*factor//100
             righthorizh = selfh - lefthorizh
             leftvertw = selfw*factor//100
             rightvertw = selfw - leftvertw
-            if not (lefthorizh > MIN_ROOM_SIZE and righthorizh > MIN_ROOM_SIZE):
+            if (lefthorizh < MIN_ROOM_SIZE or righthorizh < MIN_ROOM_SIZE):
                 horiz = 0
-            if not (leftvertw > MIN_ROOM_SIZE and rightvertw > MIN_ROOM_SIZE):
-                return
+                horizOK = False
+            if (leftvertw < MIN_ROOM_SIZE or rightvertw < MIN_ROOM_SIZE):
+                vertOK = False
+                continue
+        if not (horizOK and vertOK):
+            return
         if horiz == 1: #horizontal split
             leftc = Container(selfx, selfy, selfw, lefthorizh, "LHORIZONTAL")
             rightc = Container(selfx, selfy+lefthorizh, selfw, righthorizh, "RHORIZONTAL")
@@ -89,15 +95,8 @@ def doShit(): #delete this somewhen
     global BSPRoot
     con = Container(1,1,70,24)
     BSPRoot = treeNode(cont = con)
-    splitNTimes(4)
+    splitNTimes(6)
     leafs = BSPRoot.getLeafs()
-    # print("Level 0")
-    # for i in BSPRoot.getLevel(0):
-    #     i.cont.output()
-    # print("Level 1")
-    # for i in BSPRoot.getLevel(1):
-    #     i.cont.output()
-    # print("Level 2")
     for i in BSPRoot.getLevel(3):#leafs:
         setForegroundColor(255,0,0)
         # i.cont.output()
@@ -110,8 +109,8 @@ def doShit(): #delete this somewhen
 
 MAP_WIDTH = 80
 MAP_HEIGHT = 25
-MIN_SPLIT_FACTOR = 30 #IT will be divided by 100 somewhen
-MAX_SPLIT_FACTOR = 70 #It too
+MIN_SPLIT_FACTOR = 20 #IT will be divided by 100 somewhen
+MAX_SPLIT_FACTOR = 80 #It too
 MIN_ROOM_SIZE = 2
 BSPRoot = None#treeNode(cont=Container(0,0,MAP_WIDTH, MAP_HEIGHT))
 
