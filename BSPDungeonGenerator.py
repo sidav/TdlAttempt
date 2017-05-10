@@ -1,5 +1,5 @@
 from SidavRandom import * #Can be deleted if the following wrapper will be handled
-from ConsoleWrapper import  *
+from ConsoleWrapper import *
 
 
 def random(min, max): #IT'S JUST A WRAPPER. Min, max inclusive!
@@ -13,7 +13,7 @@ class treeNode:
         self.right = None
         self.cont = cont
 
-    def getLevel(self, lvl, nodelist=None): #should be called from the root only
+    def getLevel(self, lvl, nodelist=None): #should be called from the root node only
         if nodelist == None:
             nodelist = []
         if lvl == 0:
@@ -48,28 +48,30 @@ class treeNode:
         rightvertw = selfw - leftvertw
         horiz = random(0, 1) #0 is horizontal splitting, 1 is vertical
         if horiz == 0:
-            leftc = Container(selfx, selfy, selfw, lefthorizh)
-            rightc = Container(selfx, lefthorizh, selfw, righthorizh)
+            leftc = Container(selfx, selfy, selfw, lefthorizh, "LHORIZONTAL")
+            rightc = Container(selfx, selfy+lefthorizh, selfw, righthorizh, "RHORIZONTAL")
             self.left = treeNode(self, leftc)
             self.right = treeNode(self, rightc)
         else:
-            leftc = Container(selfx, selfy, leftvertw, selfh)
-            rightc = Container(leftvertw, selfy, rightvertw, selfh)
+            leftc = Container(selfx, selfy, leftvertw, selfh, "LVERTICAL")
+            rightc = Container(selfx+leftvertw, selfy, rightvertw, selfh, "RVERTICAL")
             self.left = treeNode(self, leftc)
             self.right = treeNode(self, rightc)
 
 
 class Container:
-    def __init__(self, x, y, w, h):
+    def __init__(self, x, y, w, h, vh = "UNDEF"):
         self.x = x
         self.y = y
         self.w = w
         self.h = h
-    def draw(self):
-        drawRect(self.x,self.y,self.w,self.h)
+        self.vh = vh
+
+    def draw(self): #for debug purposes
+        drawRect(self.x-1,self.y-1,self.w+1,self.h+1)
 
     def output(self): #for debug purposes
-        print("x = %i, y = %i, w = %i, h = %i" % (self.x,self.y,self.w,self.h))
+        print("x = %i, y = %i, w = %i, h = %i, splitting was %s" % (self.x,self.y,self.w,self.h, self.vh))
 
 
 def splitNTimes(N):
@@ -80,19 +82,31 @@ def splitNTimes(N):
 
 def doShit(): #delete this somewhen
     global BSPRoot
-    con = Container(0,0,80,25)
+    con = Container(1,1,70,24)
     BSPRoot = treeNode(cont = con)
     splitNTimes(3)
     leafs = BSPRoot.getLeafs()
-    for i in leafs:
-        i.cont.output()
+    # print("Level 0")
+    # for i in BSPRoot.getLevel(0):
+    #     i.cont.output()
+    # print("Level 1")
+    # for i in BSPRoot.getLevel(1):
+    #     i.cont.output()
+    # print("Level 2")
+    for i in BSPRoot.getLevel(3):#leafs:
+        setForegroundColor(255,0,0)
+        # i.cont.output()
+        i.cont.draw()
+    for i in BSPRoot.getLeafs():#leafs:
+        setForegroundColor(255, 255, 255)
+        # i.cont.output()
         i.cont.draw()
 
 
 MAP_WIDTH = 80
 MAP_HEIGHT = 25
-MIN_SPLIT_FACTOR = 40 #IT will be divided by 100 somewhen
-MAX_SPLIT_FACTOR = 60 #It too
+MIN_SPLIT_FACTOR = 30 #IT will be divided by 100 somewhen
+MAX_SPLIT_FACTOR = 70 #It too
 MIN_ROOM_SIZE = 2
 BSPRoot = None#treeNode(cont=Container(0,0,MAP_WIDTH, MAP_HEIGHT))
 

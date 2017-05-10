@@ -1,3 +1,5 @@
+import random
+
 LCG_X = 1
 
 
@@ -13,3 +15,6 @@ def rand(mod):
 def srand(seed):
     global LCG_X
     LCG_X = seed
+
+def randomize():
+    srand(random.getrandbits(32))
