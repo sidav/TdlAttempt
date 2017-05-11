@@ -36,7 +36,7 @@ class treeNode:
             self.right.getLeafs(leafs)
         return leafs
 
-    def split(self): #BSP splitting
+    def splitSelf(self): #BSP splitting
         selfx = self.cont.x
         selfy = self.cont.y
         selfw = self.cont.w
@@ -50,10 +50,10 @@ class treeNode:
             righthorizh = selfh - lefthorizh
             leftvertw = selfw*factor//100
             rightvertw = selfw - leftvertw
-            if (lefthorizh < MIN_ROOM_SIZE or righthorizh < MIN_ROOM_SIZE):
+            if (lefthorizh < MIN_ROOM_HEIGHT or righthorizh < MIN_ROOM_HEIGHT):
                 horiz = 0
                 horizOK = False
-            if (leftvertw < MIN_ROOM_SIZE or rightvertw < MIN_ROOM_SIZE):
+            if (leftvertw < MIN_ROOM_WIDTH or rightvertw < MIN_ROOM_WIDTH):
                 vertOK = False
                 continue
         if not (horizOK and vertOK):
@@ -101,7 +101,7 @@ def splitNTimes(root, N):
     for _ in range(N):
         leafs = root.getLeafs()
         for l in leafs:
-            l.split()
+            l.splitSelf()
 
 def placeConnections(root, arr):
     # the following loop will draw the connections between the nodes with the same parent.
@@ -128,19 +128,18 @@ def placeConnections(root, arr):
         curlvl += 1
 
 def placeDoors(arr):
+    setForegroundColor(200, 0, 96) # <- DELETE IT
     for i in range(1, len(arr)-1):
         for j in range(1, len(arr[0])-1):
             #horizontal doors:
             if arr[i][j] == " " and arr[i][j-1] == "#" and arr[i][j+1] == "#" and arr[i-1][j] == " " and arr[i+1][j] == " ":
                 arr[i][j] = "+"
                 #DELETE THE FOLLOWING:
-                setForegroundColor(255,0,0)
                 putChar("+", i, j)
             #vertical doors:
             elif arr[i][j] == " " and arr[i-1][j] == "#" and arr[i+1][j] == "#" and arr[i][j-1] == " " and arr[i][j+1] == " ":
                 arr[i][j] = "+"
                 # DELETE THE FOLLOWING:
-                setForegroundColor(255, 0, 0)
                 putChar("+", i, j)
 
 
@@ -159,7 +158,7 @@ def doShit(): #delete this somewhen
     # draw the char array (it is just for debug)
     setForegroundColor(255, 255, 255)
     drawCharArray(outp)
-    
+
     placeDoors(outp)
 
 
@@ -168,7 +167,8 @@ MAP_WIDTH = 80
 MAP_HEIGHT = 25
 MIN_SPLIT_FACTOR = 25 #IT will be divided by 100 somewhen
 MAX_SPLIT_FACTOR = 75 #It too
-MIN_ROOM_SIZE = 3
+MIN_ROOM_WIDTH = 4
+MIN_ROOM_HEIGHT = 2
 
 # FLOOR = 0
 # WALL = 1
