@@ -1,6 +1,7 @@
 #import tdl
 from ConsoleWrapper import *
 from BSPDungeonGenerator import doShit
+from CellularAutomataDungeonGenerator import doCAshit
 from SidavRandom import *
 #DELETE FOLLOWING AFTER DEBUG:
 from SimplePathfinding import *
@@ -30,7 +31,8 @@ def mainLoop():
     while not tdl.event.is_window_closed(): # <--- not shit
         if Re_generate:
             clearConsole()
-            doShit()
+            #doShit() #It's BSP generator's shit.
+            doCAshit()
             Re_generate = False
         #drawRect(3,1,10,10)
     #################
