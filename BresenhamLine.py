@@ -45,13 +45,13 @@ def get_circle(x0, y0, radius):
     radiusError = 1 - x
     while (x >= y):
         circle.append(xy(x + x0, y + y0))
-        # circle.append(xy(y + x0, x + y0))
-        # circle.append(xy(-x + x0, y + y0))
-        # circle.append(xy(-y + x0, x + y0))
-        # circle.append(xy(-x + x0, -y + y0))
-        # circle.append(xy(-y + x0, -x + y0))
-        # circle.append(xy(x + x0, -y + y0))
-        # circle.append(xy(y + x0, -x + y0))
+        circle.append(xy(y + x0, x + y0))
+        circle.append(xy(-x + x0, y + y0))
+        circle.append(xy(-y + x0, x + y0))
+        circle.append(xy(-x + x0, -y + y0))
+        circle.append(xy(-y + x0, -x + y0))
+        circle.append(xy(x + x0, -y + y0))
+        circle.append(xy(y + x0, -x + y0))
         y+=1
         if (radiusError < 0):
             radiusError += 2 * y + 1

@@ -18,9 +18,12 @@ def keys():
     if (keypressed.key == 'UP') or (keypressed.key == 'KP8'): playery -= 1
     if (keypressed.key == 'DOWN'): playery += 1
     if (keypressed.key == 'LEFT'): playerx -= 1
+    if (keypressed.key == 'RIGHT'): playerx += 1
     if (keypressed.key == 'SPACE'):
         Re_generate = True
-    if (keypressed.key == 'RIGHT'): playerx += 1
+    if (keypressed.key == 'ENTER'):
+        randomize()
+        Re_generate = True
 
 def mainLoop():
     global Re_generate

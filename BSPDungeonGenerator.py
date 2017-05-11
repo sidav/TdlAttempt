@@ -1,5 +1,5 @@
 from SidavRandom import * #Can be deleted if the following wrapper will be handled
-from ConsoleWrapper import *
+from ConsoleWrapper import drawCharArray, setForegroundColor, putChar
 
 
 def random(min, max): #IT'S JUST A WRAPPER. Min, max inclusive!
@@ -78,40 +78,39 @@ class Container:
         self.h = h
         self.vh = vh
 
-    def draw(self): #for debug purposes
-        drawRect(self.x-1,self.y-1,self.w+1,self.h+1)
+    def addToMap(self, arr):
+        x0 = self.x-1
+        y0 = self.y-1
+        h = self.h+1
+        w = self.w+1
+        for i in range(x0, x0 + w):
+            arr[i][y0] = "#"
+            arr[i][y0+h-1] = "#"
+        for j in range(y0, y0 + h):
+            arr[x0][j] = "#"
+            arr[x0+w-1][j] = "#"
+
+    # def draw(self): #for debug purposes
+    #     drawRect(self.x-1,self.y-1,self.w+1,self.h+1)
 
     def output(self): #for debug purposes
         print("x = %i, y = %i, w = %i, h = %i, splitting was %s" % (self.x,self.y,self.w,self.h, self.vh))
-
-
-def splitNTimes(N):
+#############################################################################################################
+#############################################################################################################
+def splitNTimes(root, N):
     for _ in range(N):
-        leafs = BSPRoot.getLeafs()
+        leafs = root.getLeafs()
         for l in leafs:
             l.split()
 
-def doShit(): #delete this somewhen
-    global BSPRoot
-    con = Container(1,1,79,24)
-    BSPRoot = treeNode(cont = con)
-    splitNTimes(6)
-    leafs = BSPRoot.getLeafs()
-    for i in BSPRoot.getLevel(3):#leafs:
-        setForegroundColor(255,0,0)
-        # i.cont.output()
-        i.cont.draw()
-    for i in BSPRoot.getLeafs():#leafs:
-        setForegroundColor(255, 255, 255)
-        # i.cont.output()
-        i.cont.draw()
-    #the following loop will draw the connections between the nodes with the same parent.
-    #It creates the smth like doorways or even removes some walls.
-    #I'm glad of the result. Really.
+def placeConnections(root, arr):
+    # the following loop will draw the connections between the nodes with the same parent.
+    # It creates the smth like doorways or even removes some walls.
+    # I'm glad of the result. Really.
     traverseEnded = False
     curlvl = 0
     while not traverseEnded:
-        a = BSPRoot.getLevel(curlvl)
+        a = root.getLevel(curlvl)
         if len(a) is 0:
             traverseEnded = True
         for i in a:
@@ -120,18 +119,56 @@ def doShit(): #delete this somewhen
                 fy = i.left.cont.y + i.left.cont.h // 2
                 tx = i.right.cont.x + i.right.cont.w // 2
                 ty = i.right.cont.y + i.right.cont.h // 2
-                drawLine(fx, fy, tx, ty, " ")
+                if fx == tx:
+                    for k in range(fy, ty + 1):
+                        arr[fx][k] = " "
+                elif fy == ty:
+                    for k in range(fx, tx + 1):
+                        arr[k][fy] = " "
         curlvl += 1
 
+def placeDoors(arr):
+    for i in range(1, len(arr)-1):
+        for j in range(1, len(arr[0])-1):
+            #horizontal doors:
+            if arr[i][j] == " " and arr[i][j-1] == "#" and arr[i][j+1] == "#" and arr[i-1][j] == " " and arr[i+1][j] == " ":
+                arr[i][j] = "+"
+                #DELETE THE FOLLOWING:
+                setForegroundColor(255,0,0)
+                putChar("+", i, j)
+            #vertical doors:
+            elif arr[i][j] == " " and arr[i-1][j] == "#" and arr[i+1][j] == "#" and arr[i][j-1] == " " and arr[i][j+1] == " ":
+                arr[i][j] = "+"
+                # DELETE THE FOLLOWING:
+                setForegroundColor(255, 0, 0)
+                putChar("+", i, j)
+
+
+
+def doShit(): #delete this somewhen
+    outp = [[" "] * (MAP_HEIGHT+1) for _ in range(MAP_WIDTH+1)]
+    con = Container(1,1,79,24)
+    BSPRoot = treeNode(cont = con)
+    splitNTimes(BSPRoot, 6)
+    leafs = BSPRoot.getLeafs()
+    for i in leafs:#leafs:
+        # i.cont.output()
+        # i.cont.draw()
+        i.cont.addToMap(outp)
+    placeConnections(BSPRoot, outp)
+    # draw the char array (it is just for debug)
+    setForegroundColor(255, 255, 255)
+    drawCharArray(outp)
+    
+    placeDoors(outp)
 
 
 
 MAP_WIDTH = 80
 MAP_HEIGHT = 25
-MIN_SPLIT_FACTOR = 20 #IT will be divided by 100 somewhen
-MAX_SPLIT_FACTOR = 80 #It too
-MIN_ROOM_SIZE = 2
-BSPRoot = None#treeNode(cont=Container(0,0,MAP_WIDTH, MAP_HEIGHT))
+MIN_SPLIT_FACTOR = 25 #IT will be divided by 100 somewhen
+MAX_SPLIT_FACTOR = 75 #It too
+MIN_ROOM_SIZE = 3
 
 # FLOOR = 0
 # WALL = 1
