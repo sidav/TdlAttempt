@@ -21,15 +21,15 @@ def putString(string, x, y):
     console.draw_str(x, y, string, bg=BACKCOLOR, fg=FORECOLOR)
 
 
-def drawLine(x0, y0, x1, y1):
+def drawLine(x0, y0, x1, y1, chr = "#"):
     line = get_line(x0, y0, x1, y1)
     for i in line:
-        putChar("#", i.x, i.y)
+        putChar(chr, i.x, i.y)
 
-def drawCircle(x0, y0, radius):
+def drawCircle(x0, y0, radius, chr = "#"):
     circle = get_circle(x0, y0, radius)
     for i in circle:
-        putChar("#", i.x, i.y)
+        putChar(chr, i.x, i.y)
 
 def drawRect(x0, y0, w, h):
     for i in range(x0, x0+w):

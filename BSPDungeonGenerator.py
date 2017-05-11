@@ -105,6 +105,25 @@ def doShit(): #delete this somewhen
         setForegroundColor(255, 255, 255)
         # i.cont.output()
         i.cont.draw()
+    #the following loop will draw the connections between the nodes with the same parent.
+    #It creates the smth like doorways or even removes some walls.
+    #I'm glad of the result. Really.
+    traverseEnded = False
+    curlvl = 0
+    while not traverseEnded:
+        a = BSPRoot.getLevel(curlvl)
+        if len(a) is 0:
+            traverseEnded = True
+        for i in a:
+            if i.left is not None and i.right is not None:
+                fx = i.left.cont.x + i.left.cont.w // 2
+                fy = i.left.cont.y + i.left.cont.h // 2
+                tx = i.right.cont.x + i.right.cont.w // 2
+                ty = i.right.cont.y + i.right.cont.h // 2
+                drawLine(fx, fy, tx, ty, " ")
+        curlvl += 1
+
+
 
 
 MAP_WIDTH = 80

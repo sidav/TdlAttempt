@@ -9,22 +9,26 @@ from AStarPathfinding import *
 playerx = SCREEN_WIDTH // 2
 playery = SCREEN_HEIGHT // 2
 exit_game = False
+Re_generate = True
 
 def keys():
-    global playerx, playery, exit_game
+    global playerx, playery, exit_game, Re_generate
     keypressed = readKey()
     if (keypressed.key == 'ESCAPE') or (keypressed.key == 'ESCAPE'): exit_game = True
     if (keypressed.key == 'UP') or (keypressed.key == 'KP8'): playery -= 1
     if (keypressed.key == 'DOWN'): playery += 1
     if (keypressed.key == 'LEFT'): playerx -= 1
     if (keypressed.key == 'SPACE'):
-        pass
+        Re_generate = True
     if (keypressed.key == 'RIGHT'): playerx += 1
 
 def mainLoop():
+    global Re_generate
     while not tdl.event.is_window_closed(): # <--- not shit
-        clearConsole()
-        doShit()
+        if Re_generate:
+            clearConsole()
+            doShit()
+            Re_generate = False
         #drawRect(3,1,10,10)
     #################
     #SHIT ENDS HERE.#
