@@ -55,4 +55,5 @@ def doCAshit():
         for _ in range(300):
             aut.step()
     print(len(auts))
+    setForegroundColor(255, 255, 255)
     drawCharArray(maparr)

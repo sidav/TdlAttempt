@@ -1,3 +1,5 @@
+# import sys
+# import os
 #import tdl
 from ConsoleWrapper import *
 from BSPDungeonGenerator import doShit
@@ -11,9 +13,10 @@ playerx = SCREEN_WIDTH // 2
 playery = SCREEN_HEIGHT // 2
 exit_game = False
 Re_generate = True
+BSP: bool = True
 
 def keys():
-    global playerx, playery, exit_game, Re_generate
+    global playerx, playery, exit_game, Re_generate, BSP
     keypressed = readKey()
     if (keypressed.key == 'ESCAPE') or (keypressed.key == 'ESCAPE'): exit_game = True
     if (keypressed.key == 'UP') or (keypressed.key == 'KP8'): playery -= 1
@@ -24,15 +27,22 @@ def keys():
         Re_generate = True
     if (keypressed.key == 'ENTER'):
         randomize()
+        BSP = not BSP
         Re_generate = True
 
-def mainLoop():
+def main():
     global Re_generate
     while not tdl.event.is_window_closed(): # <--- not shit
         if Re_generate:
             clearConsole()
-            #doShit() #It's BSP generator's shit.
-            doCAshit()
+            if BSP:
+                doShit() #It's BSP generator's shit.
+                setForegroundColor(200,100,30)
+                putString("BSP Generator", 0, 0)
+            else:
+                doCAshit() #It's the cave generator shit
+                setForegroundColor(200, 100, 30)
+                putString("Cave CA Generator", 0, 0)
             Re_generate = False
         #drawRect(3,1,10,10)
     #################
@@ -46,4 +56,5 @@ def mainLoop():
             break
 
 i = 127
-mainLoop()
+if __name__ == '__main__':
+    main()
