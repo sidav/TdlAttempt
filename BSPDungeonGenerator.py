@@ -132,12 +132,14 @@ def placeDoors(arr):
     for i in range(1, len(arr)-1):
         for j in range(1, len(arr[0])-1):
             #horizontal doors:
-            if arr[i][j] == " " and arr[i][j-1] == "#" and arr[i][j+1] == "#" and arr[i-1][j] == " " and arr[i+1][j] == " ":
+            if arr[i][j] == " " and arr[i][j-1] == "#" and arr[i][j+1] == "#" and arr[i-1][j] == " " and arr[i+1][j] == " " \
+                    and (arr[i-1][j - 1] == " " or arr[i+1][j - 1] == " " or arr[i-1][j + 1] == " " or arr[i+1][j + 1] == " "  ):
                 arr[i][j] = "+"
                 #DELETE THE FOLLOWING:
                 putChar("+", i, j)
             #vertical doors:
-            elif arr[i][j] == " " and arr[i-1][j] == "#" and arr[i+1][j] == "#" and arr[i][j-1] == " " and arr[i][j+1] == " ":
+            elif arr[i][j] == " " and arr[i-1][j] == "#" and arr[i+1][j] == "#" and arr[i][j-1] == " " and arr[i][j+1] == " " \
+                    and (arr[i - 1][j - 1] == " " or arr[i + 1][j - 1] == " " or arr[i - 1][j + 1] == " " or arr[i + 1][j + 1] == " "):
                 arr[i][j] = "+"
                 # DELETE THE FOLLOWING:
                 putChar("+", i, j)
@@ -167,7 +169,7 @@ MAP_WIDTH = 80
 MAP_HEIGHT = 25
 MIN_SPLIT_FACTOR = 25 #IT will be divided by 100 somewhen
 MAX_SPLIT_FACTOR = 75 #It too
-MIN_ROOM_WIDTH = 4
+MIN_ROOM_WIDTH = 2
 MIN_ROOM_HEIGHT = 2
 
 # FLOOR = 0
