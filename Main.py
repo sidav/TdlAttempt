@@ -3,7 +3,9 @@
 # import tdl
 from ConsoleWrapper import *
 from BSPDungeonGenerator import doShit
-from CellularAutomataDungeonGenerator import doCAshit
+from CADungeonGenerator import doCAshit
+from CALandscapeGenerator import doCALandshit
+
 from SidavRandom import *
 #DELETE FOLLOWING AFTER DEBUG:
 from SimplePathfinding import *
@@ -13,10 +15,10 @@ playerx = SCREEN_WIDTH // 2
 playery = SCREEN_HEIGHT // 2
 exit_game = False
 Re_generate = True
-BSP: bool = True
+generator = 0
 
 def keys():
-    global playerx, playery, exit_game, Re_generate, BSP
+    global playerx, playery, exit_game, Re_generate, generator
     keypressed = readKey()
     if (keypressed.key == 'ESCAPE') or (keypressed.key == 'ESCAPE'): exit_game = True
     if (keypressed.key == 'UP') or (keypressed.key == 'KP8'): playery -= 1
@@ -27,7 +29,9 @@ def keys():
         Re_generate = True
     if (keypressed.key == 'ENTER'):
         randomize()
-        BSP = not BSP
+        generator+=1
+        if generator > 2:
+            generator = 0
         Re_generate = True
 
 def main():
@@ -35,11 +39,15 @@ def main():
     while not tdl.event.is_window_closed(): # <--- not shit
         if Re_generate:
             clearConsole()
-            if BSP:
+            if generator == 0:
+                doCALandshit() #It's the landscape generator's shit.
+                setForegroundColor(200,100,30)
+                putString("CA Landscape Generator", 0, 0)
+            if generator == 1:
                 doShit() #It's BSP generator's shit.
                 setForegroundColor(200,100,30)
                 putString("BSP Generator", 0, 0)
-            else:
+            elif generator == 2:
                 doCAshit() #It's the cave generator shit
                 setForegroundColor(200, 100, 30)
                 putString("Cave CA Generator", 0, 0)
