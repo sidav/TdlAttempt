@@ -5,7 +5,11 @@ SCREEN_HEIGHT = 25
 
 LIMIT_FPS = 20  # 20 frames-per-second maximum
 
-tdl.set_font('terminal8x12_gs_ro.png', greyscale=True, altLayout=False)
+try:
+    tdl.set_font('terminal8x12_gs_ro.png', greyscale=True, altLayout=False)
+except:
+    pass
+
 console = tdl.init(SCREEN_WIDTH, SCREEN_HEIGHT, title="Roguelike", fullscreen= False, renderer= "SDL")
 FORECOLOR = (255,255,255)
 BACKCOLOR = (0, 0, 0)
