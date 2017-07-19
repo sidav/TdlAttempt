@@ -105,7 +105,7 @@ def splitNTimes(root, N):
 
 def placeConnections(root, arr):
     # the following loop will draw the connections between the nodes with the same parent.
-    # It creates the smth like doorways or even removes some walls.
+    # It creates smth like doorways or even removes some walls.
     # I'm glad of the result. Really.
     traverseEnded = False
     curlvl = 0
@@ -128,49 +128,47 @@ def placeConnections(root, arr):
         curlvl += 1
 
 def placeDoors(arr):
-    setForegroundColor(200, 0, 96) # <- DELETE IT
     for i in range(1, len(arr)-1):
         for j in range(1, len(arr[0])-1):
             #horizontal doors:
             if arr[i][j] == " " and arr[i][j-1] == "#" and arr[i][j+1] == "#" and arr[i-1][j] == " " and arr[i+1][j] == " " \
                     and (arr[i-1][j - 1] == " " or arr[i+1][j - 1] == " " or arr[i-1][j + 1] == " " or arr[i+1][j + 1] == " "  ):
                 arr[i][j] = "+"
-                #DELETE THE FOLLOWING:
-                putChar("+", i, j)
             #vertical doors:
             elif arr[i][j] == " " and arr[i-1][j] == "#" and arr[i+1][j] == "#" and arr[i][j-1] == " " and arr[i][j+1] == " " \
                     and (arr[i - 1][j - 1] == " " or arr[i + 1][j - 1] == " " or arr[i - 1][j + 1] == " " or arr[i + 1][j + 1] == " "):
                 arr[i][j] = "+"
-                # DELETE THE FOLLOWING:
-                putChar("+", i, j)
 
 
 
-def doShit(): #delete this somewhen
+def generateMap():
     outp = [[" "] * (MAP_HEIGHT+1) for _ in range(MAP_WIDTH+1)]
-    con = Container(1,1,79,24)
+    con = Container(1,1,MAP_WIDTH-1,MAP_HEIGHT-1)
     BSPRoot = treeNode(cont = con)
-    splitNTimes(BSPRoot, 6)
+    splitNTimes(BSPRoot, SPLITS)
     leafs = BSPRoot.getLeafs()
     for i in leafs:#leafs:
         # i.cont.output()
         # i.cont.draw()
         i.cont.addToMap(outp)
     placeConnections(BSPRoot, outp)
+    placeDoors(outp)
+    #DELETE...
     # draw the char array (it is just for debug)
     setForegroundColor(255, 255, 255)
     drawCharArray(outp)
+    #...UNTIL THERE
+    return outp
 
-    placeDoors(outp)
 
 
-
-MAP_WIDTH = 80
-MAP_HEIGHT = 25
+MAP_WIDTH = 160
+MAP_HEIGHT = 75
 MIN_SPLIT_FACTOR = 25 #IT will be divided by 100 somewhen
 MAX_SPLIT_FACTOR = 75 #It too
 MIN_ROOM_WIDTH = 2
 MIN_ROOM_HEIGHT = 2
+SPLITS = 15
 
 # FLOOR = 0
 # WALL = 1

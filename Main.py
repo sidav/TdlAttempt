@@ -2,7 +2,7 @@
 # import os
 # import tdl
 from ConsoleWrapper import *
-from BSPDungeonGenerator import doShit
+from BSPDungeonGenerator import generateMap
 from CADungeonGenerator import doCAshit
 from CALandscapeGenerator import doCALandshit
 
@@ -15,7 +15,7 @@ playerx = SCREEN_WIDTH // 2
 playery = SCREEN_HEIGHT // 2
 exit_game = False
 Re_generate = True
-generator = 0
+generator = 1
 
 def keys():
     global playerx, playery, exit_game, Re_generate, generator
@@ -44,7 +44,7 @@ def main():
                 setForegroundColor(200,100,30)
                 putString("CA Landscape Generator", 0, 0)
             if generator == 1:
-                doShit() #It's BSP generator's shit.
+                generateMap() #It's BSP generator's shit.
                 setForegroundColor(200,100,30)
                 putString("BSP Generator", 0, 0)
             elif generator == 2:

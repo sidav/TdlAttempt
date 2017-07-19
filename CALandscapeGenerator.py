@@ -18,11 +18,14 @@ def randVertDir(): #What a shame.
         return 0
 
 
-MAP_WIDTH = 80
-MAP_HEIGHT = 25
-TOTAL_LAND_AUTOMS = 8
-TOTAL_MNT_AUTOMS = 5
-TOTAL_FOREST_AUTOMS = 12
+MAP_WIDTH = 160#80
+MAP_HEIGHT = 75#25
+TOTAL_LAND_AUTOMS = 26#8
+TOTAL_MNT_AUTOMS = 20#5
+TOTAL_FOREST_AUTOMS = 14#12
+LAND_CYCLES = 1000
+MNT_CYCLES = 250
+FOREST_CYCLES = 350
 
 class Automata:
     def __init__(self, x, y, maparr, brush, allowed = []):
@@ -82,11 +85,11 @@ def drawMap(maparr):
 def doCALandshit():
     maparr = [["~"] * (MAP_HEIGHT + 1) for _ in range(MAP_WIDTH + 1)]
     #land
-    addLandscapeElements(maparr, TOTAL_LAND_AUTOMS, ".", ["~"], 550, True)
+    addLandscapeElements(maparr, TOTAL_LAND_AUTOMS, ".", ["~"], LAND_CYCLES, True)
     #mountains
-    addLandscapeElements(maparr, TOTAL_MNT_AUTOMS, "^", ["."], 150)
+    addLandscapeElements(maparr, TOTAL_MNT_AUTOMS, "^", ["."], MNT_CYCLES)
     # forest
-    addLandscapeElements(maparr, TOTAL_FOREST_AUTOMS, "f", [".", "^"], 50)
+    addLandscapeElements(maparr, TOTAL_FOREST_AUTOMS, "f", [".", "^"], FOREST_CYCLES)
     setForegroundColor(255, 255, 255)
     drawMap(maparr)
     #drawCharArray(maparr)
