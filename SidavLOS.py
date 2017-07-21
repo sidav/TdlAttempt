@@ -59,20 +59,22 @@ def _straightLOSCheck(fromx, fromy, tox, toy):
     mapW = len(_visionObstructingMap)
     mapH = len(_visionObstructingMap[0])
     line = get_line(fromx, fromy, tox, toy)
+    lineLength = len(line)
+
     for i, currCell in enumerate(line):
         x = currCell.x
         y = currCell.y
         if (x < 0 or y < 0 or x > mapW-1 or y > mapH-1):
             return False
-        if _visionObstructingMap[x][y] == True and i < len(line)-1:
+        if _visionObstructingMap[x][y] == True and i < lineLength-1:
             return False
     return True
 
 def _checkNeighbouringTiles(x, y, firstStageTable): #checks if the tile has some first-stage-visible neighbours
     mapW = len(firstStageTable)
     mapH = len(firstStageTable[0])
-    for i in range(-1, 2):
-        for j in range(-1, 2):
+    for i in [-1, 0, 1]:
+        for j in [-1, 0, 1]:
             if x+i < 0 or x+i >= mapW or y+j < 0 or y+j >= mapH:
                 continue
             if abs(i*j) == 1:
@@ -89,25 +91,30 @@ def getVisibilityTable(fromx, fromy):
     resultingMap = [[False] * (mapH) for _ in range(mapW)]
     #first stage
     firstStage = [[False] * (mapH) for _ in range(mapW)]
-    for i in range(len(firstStage)):
-        for j in range(len(firstStage[0])):
+    for i in range(mapW):
+        for j in range(mapH):
             firstStage[i][j] = _straightLOSCheck(fromx, fromy, i, j)
     #second stage
     secondStage = [[False] * (mapH) for _ in range(mapW)]
-    for i in range(len(secondStage)):
-        for j in range(len(secondStage[0])):
+    for i in range(mapW):
+        for j in range(mapH):
+            if firstStage[i][j]:
+                continue
             if _visionObstructingMap[i][j]:
                 secondStage[i][j] = _checkNeighbouringTiles(i, j, firstStage)
     #merging stages
-    for i in range(len(firstStage)):
-        for j in range(len(firstStage[0])):
+    for i in range(mapW):
+        for j in range(mapH):
             resultingMap[i][j] = bool(firstStage[i][j] or secondStage[i][j])
     return resultingMap
+
 
 def visibleLineExists(fromx, fromy, tox, toy):
     global _lastFromX, _lastFromY, _lastVisibilityTable
     mapW = len(_visionObstructingMap)
     mapH = len(_visionObstructingMap[0])
+    if fromx == tox and fromy == toy:
+        return True
     if fromx < 0 or fromx >= mapW or fromy < 0 or fromy >= mapH:
         return False
     if fromx == _lastFromX and fromy == _lastFromY and _lastVisibilityTable != [[]]:
