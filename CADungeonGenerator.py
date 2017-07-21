@@ -4,7 +4,7 @@ from ConsoleWrapper import drawCharArray, setForegroundColor, putChar
 ### PATHFINDING SHIT FOR THE MAP VALIDATION
 ### All that pathfinding routines are so much simplified because their purpose is just to check if the path exists at all.
 ### i.e. that routines don't even need to find the shortest path, they should just check does there ANY path exist.
-### The original ("full" with shortest finding) algorithm is in the SimplePathfiding.py in that repo.
+### The original ("full" with shortest path search) algorithm is in the SimplePathfiding.py in that repo.
 class cell:
     def __init__(self, x, y, passabru, value):
         self.x = x
@@ -116,9 +116,10 @@ def randVertDir(): #What a shame.
         return 0
 
 
-MAP_WIDTH = 80
-MAP_HEIGHT = 25
-TOTAL_AUTOMATA_PAIRS = 4
+_MAP_WIDTH = 159
+_MAP_HEIGHT = 74
+_TOTAL_AUTOMATA_PAIRS = 8
+_GENERATION_STEPS = 1250
 
 class Automata:
     def __init__(self, x, y, maparr):
@@ -141,7 +142,7 @@ class Automata:
                 break
 
 def mapTooBoolArray(inputMap):
-    boolMap = [[False] * (MAP_HEIGHT + 1) for _ in range(MAP_WIDTH+1)]
+    boolMap = [[False] * (_MAP_HEIGHT + 1) for _ in range(_MAP_WIDTH+1)]
     for i in range(len(inputMap)):
         for j in range(len(inputMap[0])):
             if inputMap[i][j] == " ":
@@ -156,19 +157,19 @@ def generateCave():
             self.y = y
 
     while True:
-        maparr = [["#"] * (MAP_HEIGHT + 1) for _ in range(MAP_WIDTH + 1)]
+        maparr = [["#"] * (_MAP_HEIGHT + 1) for _ in range(_MAP_WIDTH + 1)]
         auts = []
         autsInitialPositions = []
-        for i in range(1, TOTAL_AUTOMATA_PAIRS + 1):
-            x = i * MAP_WIDTH // (TOTAL_AUTOMATA_PAIRS + 1)
-            y = i * MAP_HEIGHT // (TOTAL_AUTOMATA_PAIRS + 1)
+        for i in range(1, _TOTAL_AUTOMATA_PAIRS + 1):
+            x = i * _MAP_WIDTH // (_TOTAL_AUTOMATA_PAIRS + 1)
+            y = i * _MAP_HEIGHT // (_TOTAL_AUTOMATA_PAIRS + 1)
             auts.append(Automata(x, y, maparr))
-            auts.append(Automata(x, MAP_HEIGHT - y, maparr))
+            auts.append(Automata(x, _MAP_HEIGHT - y, maparr))
             autsInitialPositions.append(position(x, y))
-            autsInitialPositions.append(position(x, MAP_HEIGHT - y))
-            # auts.append(Automata(MAP_WIDTH-x, y, maparr))
+            autsInitialPositions.append(position(x, _MAP_HEIGHT - y))
+            # auts.append(Automata(_MAP_WIDTH-x, y, maparr))
         for aut in auts:
-            for _ in range(350):
+            for _ in range(_GENERATION_STEPS):
                 aut.step()
         #validate cave:
         validator = CrapPathfinding(mapTooBoolArray(maparr))

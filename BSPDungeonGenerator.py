@@ -5,13 +5,13 @@ from ConsoleWrapper import drawCharArray, setForegroundColor, putChar
 def random(min, max): #IT'S JUST A WRAPPER. Min, max inclusive!
     return rand(max-min+1)+min
 
-_MAP_WIDTH = 160
-_MAP_HEIGHT = 75
+_MAP_WIDTH = 80
+_MAP_HEIGHT = 25
 _MIN_SPLIT_FACTOR = 25 #IT will be divided by 100 somewhen
 _MAX_SPLIT_FACTOR = 75 #It too
-_MIN_ROOM_WIDTH = 1
-_MIN_ROOM_HEIGHT = 1
-_SPLITS = 15
+_MIN_ROOM_WIDTH = 3
+_MIN_ROOM_HEIGHT = 3
+_SPLITS = 12
 
 _FLOOR_CODE = ' '
 _WALL_CODE = '#'
@@ -165,7 +165,7 @@ def generateMap():
     makeWallOutline(outp)
     #DELETE...
     # draw the char array (it is just for debug)
-    setForegroundColor(255, 255, 255)
-    drawCharArray(outp)
+    # setForegroundColor(255, 255, 255)
+    # drawCharArray(outp)
     #...UNTIL THERE.
     return outp
