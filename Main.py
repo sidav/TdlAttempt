@@ -5,6 +5,7 @@ from ConsoleWrapper import *
 from BSPDungeonGenerator import generateMap
 from CADungeonGenerator import doCAshit
 from CALandscapeGenerator import doCALandshit
+import SidavLOS as LOS
 
 from SidavRandom import *
 #DELETE FOLLOWING AFTER DEBUG:
@@ -13,6 +14,7 @@ from AStarPathfinding import *
 
 playerx = SCREEN_WIDTH // 2
 playery = SCREEN_HEIGHT // 2
+map = [[]]
 exit_game = False
 Re_generate = True
 generator = 1
@@ -34,8 +36,9 @@ def keys():
             generator = 0
         Re_generate = True
 
+
 def main():
-    global Re_generate
+    global Re_generate, map
     while not tdl.event.is_window_closed(): # <--- not shit
         if Re_generate:
             clearConsole()
@@ -44,7 +47,7 @@ def main():
                 setForegroundColor(200,100,30)
                 putString("CA Landscape Generator", 0, 0)
             if generator == 1:
-                generateMap() #It's BSP generator's shit.
+                map = generateMap() #It's BSP generator's shit.
                 setForegroundColor(200,100,30)
                 putString("BSP Generator", 0, 0)
             elif generator == 2:
@@ -53,6 +56,28 @@ def main():
                 putString("Cave CA Generator", 0, 0)
             Re_generate = False
         #drawRect(3,1,10,10)
+        ##FOLLOWING IS LOS TEST
+        setForegroundColor(96, 96, 96)
+        drawCharArray(map)
+        obstrMap = [[True] * (len(map[0])) for _ in range(len(map))]
+        for i, row in enumerate(map):
+            for j, col in enumerate(map[0]):
+                if map[i][j] == '+':
+                    map[i][j] = ' '
+                if map[i][j] == ' ':
+                    obstrMap[i][j] = False
+        LOS.setvisionObstructingMap(obstrMap)
+        visMap = LOS.getVisibilityTable(playerx, playery)
+        for i in range(len(visMap)):
+            for j in range(len(visMap[0])):
+                if visMap[i][j]:
+                    setBackgroundColor(100, 100, 100)
+                    setForegroundColor(255,255,255)
+                    putChar(map[i][j], i, j)
+        setBackgroundColor(255, 0, 0)
+        putChar('@', playerx, playery)
+        setBackgroundColor(0, 0, 0)
+        ##LOS TEST ENDS HERE
     #################
     #SHIT ENDS HERE.#
     #################

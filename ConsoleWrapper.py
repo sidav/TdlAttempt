@@ -1,7 +1,7 @@
 import tdl
 
-SCREEN_WIDTH = 160#80
-SCREEN_HEIGHT = 75#25
+SCREEN_WIDTH = 80#80
+SCREEN_HEIGHT = 25#25
 
 LIMIT_FPS = 20  # 20 frames-per-second maximum
 
