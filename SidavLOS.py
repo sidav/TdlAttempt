@@ -1,6 +1,11 @@
 #TODO: get rid of dependencies
 #import Routines.TdlConsoleWrapper as CW
-#TODO: TEST THIS FUCKING CRAP
+#TODO: Optimisation for faster work.
+
+_lastFromX = _lastFromY = -1
+_lastVisibilityTable = [[]]
+
+
 
 class xy:
     def __init__(self, x, y):
@@ -98,3 +103,17 @@ def getVisibilityTable(fromx, fromy):
         for j in range(len(firstStage[0])):
             resultingMap[i][j] = bool(firstStage[i][j] or secondStage[i][j])
     return resultingMap
+
+def visibleLineExists(fromx, fromy, tox, toy):
+    global _lastFromX, _lastFromY, _lastVisibilityTable
+    mapW = len(_visionObstructingMap)
+    mapH = len(_visionObstructingMap[0])
+    if fromx < 0 or fromx >= mapW or fromy < 0 or fromy >= mapH:
+        return False
+    if fromx == _lastFromX and fromy == _lastFromY and _lastVisibilityTable != [[]]:
+        return bool(_lastVisibilityTable[tox][toy])
+    else:
+        _lastFromX = fromx
+        _lastFromY = fromy
+        _lastVisibilityTable = getVisibilityTable(fromx, fromy)
+        return bool(_lastVisibilityTable[tox][toy])

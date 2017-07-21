@@ -57,8 +57,9 @@ def main():
             Re_generate = False
         #drawRect(3,1,10,10)
         ##FOLLOWING IS LOS TEST
-        setForegroundColor(96, 96, 96)
-        drawCharArray(map)
+        # setForegroundColor(96, 96, 96)
+        # drawCharArray(map)
+        clearConsole()
         obstrMap = [[True] * (len(map[0])) for _ in range(len(map))]
         for i, row in enumerate(map):
             for j, col in enumerate(map[0]):
@@ -67,10 +68,10 @@ def main():
                 if map[i][j] == ' ':
                     obstrMap[i][j] = False
         LOS.setvisionObstructingMap(obstrMap)
-        visMap = LOS.getVisibilityTable(playerx, playery)
-        for i in range(len(visMap)):
-            for j in range(len(visMap[0])):
-                if visMap[i][j]:
+        #visMap = LOS.getVisibilityTable(playerx, playery)
+        for i in range(len(map)):
+            for j in range(len(map[0])):
+                if LOS.visibleLineExists(playerx, playery, i, j):
                     setBackgroundColor(100, 100, 100)
                     setForegroundColor(255,255,255)
                     putChar(map[i][j], i, j)
