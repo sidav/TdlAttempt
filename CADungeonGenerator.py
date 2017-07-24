@@ -116,10 +116,10 @@ def randVertDir(): #What a shame.
         return 0
 
 
-_MAP_WIDTH = 159
-_MAP_HEIGHT = 74
+_MAP_WIDTH = 80
+_MAP_HEIGHT = 25
 _TOTAL_AUTOMATA_PAIRS = 8
-_GENERATION_STEPS = 1250
+_GENERATION_STEPS = 250
 
 class Automata:
     def __init__(self, x, y, maparr):
@@ -149,6 +149,15 @@ def mapTooBoolArray(inputMap):
                 boolMap[i][j] = True
     return boolMap
 
+def makeWallOutline(arr): #just to be sure that the map won't be open to its borders.
+    mapW = len(arr)
+    mapH = len(arr[0])
+    for i in range(len(arr)):
+        for j in range(len(arr[0])):
+            if 0 < i < mapW - 1 and 0 < j < mapH - 1:
+                continue
+            arr[i][j] = '#'# _WALL_CODE
+
 
 def generateCave():
     class position:
@@ -171,6 +180,8 @@ def generateCave():
         for aut in auts:
             for _ in range(_GENERATION_STEPS):
                 aut.step()
+        #make wall outline:
+        makeWallOutline(maparr)
         #validate cave:
         validator = CrapPathfinding(mapTooBoolArray(maparr))
         mapIsValid = True
@@ -186,3 +197,4 @@ def doCAshit():
     maparr = generateCave()
     setForegroundColor(255, 255, 255)
     drawCharArray(maparr)
+    return maparr

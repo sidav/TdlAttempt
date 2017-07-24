@@ -10,7 +10,7 @@ try:
 except:
     pass
 
-console = tdl.init(SCREEN_WIDTH, SCREEN_HEIGHT, title="Roguelike", fullscreen= False, renderer= "SDL")
+console = tdl.init(SCREEN_WIDTH, SCREEN_HEIGHT, title="TDL testing ground", fullscreen= False, renderer= "SDL")
 FORECOLOR = (255,255,255)
 BACKCOLOR = (0, 0, 0)
 

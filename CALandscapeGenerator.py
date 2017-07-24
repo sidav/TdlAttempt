@@ -18,8 +18,8 @@ def randVertDir(): #What a shame.
         return 0
 
 
-MAP_WIDTH = 160#80
-MAP_HEIGHT = 75#25
+MAP_WIDTH = 80
+MAP_HEIGHT = 25
 TOTAL_LAND_AUTOMS = 26#8
 TOTAL_MNT_AUTOMS = 20#5
 TOTAL_FOREST_AUTOMS = 14#12

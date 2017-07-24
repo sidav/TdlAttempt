@@ -24,9 +24,9 @@ def keys():
     keypressed = readKey()
     if (keypressed.key == 'ESCAPE') or (keypressed.key == 'ESCAPE'): exit_game = True
     if (keypressed.key == 'UP') or (keypressed.key == 'KP8'): playery -= 1
-    if (keypressed.key == 'DOWN'): playery += 1
-    if (keypressed.key == 'LEFT'): playerx -= 1
-    if (keypressed.key == 'RIGHT'): playerx += 1
+    if (keypressed.key == 'DOWN') or (keypressed.key == 'KP2'): playery += 1
+    if (keypressed.key == 'LEFT') or (keypressed.key == 'KP4'): playerx -= 1
+    if (keypressed.key == 'RIGHT') or (keypressed.key == 'KP6'): playerx += 1
     if (keypressed.key == 'SPACE'):
         Re_generate = True
     if (keypressed.key == 'ENTER'):
@@ -51,14 +51,12 @@ def main():
                 setForegroundColor(200,100,30)
                 putString("BSP Generator", 0, 0)
             elif generator == 2:
-                doCAshit() #It's the cave generator shit
+                map = doCAshit() #It's the cave generator shit
                 setForegroundColor(200, 100, 30)
                 putString("Cave CA Generator", 0, 0)
             Re_generate = False
         #drawRect(3,1,10,10)
-        ##FOLLOWING IS LOS TEST
-        # setForegroundColor(96, 96, 96)
-        # drawCharArray(map)
+        ##FOLLOWING SHIT IS LOS TEST
         clearConsole()
         obstrMap = [[True] * (len(map[0])) for _ in range(len(map))]
         for i, row in enumerate(map):
@@ -69,6 +67,8 @@ def main():
                     obstrMap[i][j] = False
         LOS.setvisionObstructingMap(obstrMap)
         #visMap = LOS.getVisibilityTable(playerx, playery)
+        setForegroundColor(12, 12, 72)
+        drawCharArray(map)
         for i in range(len(map)):
             for j in range(len(map[0])):
                 if LOS.visibleLineExists(playerx, playery, i, j):
