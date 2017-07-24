@@ -1,14 +1,26 @@
-from SidavRandom import * #Can be deleted if the following wrapper will be handled
-from ConsoleWrapper import drawCharArray, setForegroundColor, putChar
+#############################################################################
+def _random(min, max): #IT'S JUST A WRAPPER. Min, max inclusive!            #
+    return _rand(max-min+1)+min                                             #
+                                                                            #
+_LCG_X = None                                                               #
+                                                                            #
+def setRandomSeed(seed):                                                    # FOR TEH GREAT INDEPENDENCY!
+    global _LCG_X                                                           #
+    _LCG_X = seed                                                           #
+                                                                            #
+def _rand(mod):                                                             #
+    global _LCG_X                                                           #
+    if _LCG_X is None:                                                      #
+        _LCG_X = 7355608                                                    #
+    LCG_A = 14741                                                           #
+    LCG_C = 757                                                             #
+    LCG_M = 77777677777                                                     #
+    _LCG_X = (LCG_A*_LCG_X + LCG_C) % LCG_M                                 #
+    return _LCG_X%mod                                                       #
+#############################################################################
 
-
-def random(min, max): #IT'S JUST A WRAPPER. Min, max inclusive!
-    return rand(max-min+1)+min
-
-_MAP_WIDTH = 80
-_MAP_HEIGHT = 25
-_MIN_SPLIT_FACTOR = 25 #IT will be divided by 100 somewhen
-_MAX_SPLIT_FACTOR = 75 #It too
+_MIN_SPLIT_FACTOR = 40 #In percent
+_MAX_SPLIT_FACTOR = 100 - _MIN_SPLIT_FACTOR #In percent
 _MIN_ROOM_WIDTH = 3
 _MIN_ROOM_HEIGHT = 3
 _SPLITS = 12
@@ -52,11 +64,11 @@ class treeNode:
         selfy = self.cont.y
         selfw = self.cont.w
         selfh = self.cont.h
-        horiz = random(0, 1)  # 1 is horizontal splitting, 0 is vertical
+        horiz = _random(0, 1)  # 1 is horizontal splitting, 0 is vertical
         for _ in range(5): #5 is just a number of tries
             horizOK = True
             vertOK = True
-            factor = random(_MIN_SPLIT_FACTOR, _MAX_SPLIT_FACTOR)
+            factor = _random(_MIN_SPLIT_FACTOR, _MAX_SPLIT_FACTOR)
             lefthorizh = selfh*factor//100
             righthorizh = selfh - lefthorizh
             leftvertw = selfw*factor//100
@@ -96,10 +108,16 @@ class Container:
         w = self.w+1
         for i in range(x0, x0 + w):
             arr[i][y0] = _WALL_CODE
-            arr[i][y0+h-1] = _WALL_CODE
+            try:
+                arr[i][y0+h-1] = _WALL_CODE
+            except:
+                print("BSP SECTOR PLACEMENT ERROR AT  x {}, y {}".format(i, y0+h-1))
         for j in range(y0, y0 + h):
             arr[x0][j] = _WALL_CODE
-            arr[x0+w-1][j] = _WALL_CODE
+            try:
+                arr[x0+w-1][j] = _WALL_CODE
+            except:
+                print("BSP SECTOR PLACEMENT ERROR AT x {}, y {}".format(i, y0+h-1))
 #############################################################################################################
 #############################################################################################################
 def splitNTimes(root, N):
@@ -148,13 +166,18 @@ def placeDoors(arr):
 def makeWallOutline(arr): #just to be sure that the map won't be open to its borders.
     for i in range(len(arr)):
         for j in range(len(arr[0])):
-            if i == 0 or j == 0 or i == len(arr)-2 or j == len(arr[0])-2:
+            if i == 0 or j == 0 or i == len(arr)-1 or j == len(arr[0])-1:
                 arr[i][j] = _WALL_CODE
 
+def setTileCodes(floor, wall, door):
+    global _FLOOR_CODE, _WALL_CODE, _DOOR_CODE
+    _FLOOR_CODE = floor
+    _WALL_CODE = wall
+    _DOOR_CODE = door
 
-def generateMap():
-    outp = [[_FLOOR_CODE] * (_MAP_HEIGHT+1) for _ in range(_MAP_WIDTH+1)]
-    con = Container(1,1,_MAP_WIDTH-1,_MAP_HEIGHT-1)
+def __generateMap(mapW, mapH):
+    outp = [[_FLOOR_CODE] * (mapH) for _ in range(mapW)]
+    con = Container(1, 1, mapW-1, mapH-1)
     BSPRoot = treeNode(cont = con)
     splitNTimes(BSPRoot, _SPLITS)
     leafs = BSPRoot.getLeafs()
@@ -162,10 +185,36 @@ def generateMap():
         i.cont.addToMap(outp)
     placeConnections(BSPRoot, outp)
     placeDoors(outp)
-    makeWallOutline(outp)
-    #DELETE...
-    # draw the char array (it is just for debug)
-    # setForegroundColor(255, 255, 255)
-    # drawCharArray(outp)
-    #...UNTIL THERE.
+    #makeWallOutline(outp) <-- No need now!
     return outp
+
+
+def generateMapWithRandomParams(mapW, mapH, seed = -1): #this may cause crap
+    global _MIN_SPLIT_FACTOR, _MAX_SPLIT_FACTOR, _MIN_ROOM_WIDTH, _MIN_ROOM_HEIGHT, _SPLITS
+
+    if seed != -1:
+        setRandomSeed(seed)
+
+    _MIN_SPLIT_FACTOR = _random(20, 50)
+    _MAX_SPLIT_FACTOR = 100 - _MIN_SPLIT_FACTOR
+    _MIN_ROOM_WIDTH = _random(2, 4)
+    _MIN_ROOM_HEIGHT = _random(2, 5)
+    _SPLITS = _random(2,25)
+
+    return __generateMap(mapW, mapH)
+
+
+def generateMapWithGivenParams(mapW, mapH, minSplitFactor = 40, minRoomWidth = 3, minRoomHeight = 3, splits = 12, seed = -1): #this will not cause crap most of the time
+    global _MIN_SPLIT_FACTOR, _MAX_SPLIT_FACTOR, _MIN_ROOM_WIDTH, _MIN_ROOM_HEIGHT, _SPLITS
+
+    if seed != -1:
+        setRandomSeed(seed)
+
+    _MIN_SPLIT_FACTOR = minSplitFactor  # In percent
+    _MAX_SPLIT_FACTOR = 100 - _MIN_SPLIT_FACTOR  # In percent
+    _MIN_ROOM_WIDTH = minRoomWidth
+    _MIN_ROOM_HEIGHT = minRoomHeight
+    _SPLITS = splits
+
+    return __generateMap(mapW, mapH)
+

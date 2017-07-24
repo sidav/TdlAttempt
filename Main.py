@@ -2,7 +2,8 @@
 # import os
 # import tdl
 from ConsoleWrapper import *
-from BSPDungeonGenerator import generateMap
+import BSPDungeonGenerator
+#from BSPDungeonGenerator import generateMap
 from CADungeonGenerator import doCAshit
 from CALandscapeGenerator import doCALandshit
 import SidavLOS as LOS
@@ -47,7 +48,7 @@ def main():
                 setForegroundColor(200,100,30)
                 putString("CA Landscape Generator", 0, 0)
             if generator == 1:
-                map = generateMap() #It's BSP generator's shit.
+                map = BSPDungeonGenerator.generateMapWithRandomParams(80, 25) #It's BSP generator's shit.
                 setForegroundColor(200,100,30)
                 putString("BSP Generator", 0, 0)
             elif generator == 2:
@@ -61,9 +62,9 @@ def main():
         obstrMap = [[True] * (len(map[0])) for _ in range(len(map))]
         for i, row in enumerate(map):
             for j, col in enumerate(map[0]):
-                if map[i][j] == '+':
-                    map[i][j] = ' '
-                if map[i][j] == ' ':
+                if map[i][j] == BSPDungeonGenerator._DOOR_CODE:
+                    map[i][j] = BSPDungeonGenerator._FLOOR_CODE
+                if map[i][j] == BSPDungeonGenerator._FLOOR_CODE:
                     obstrMap[i][j] = False
         LOS.setvisionObstructingMap(obstrMap)
         #visMap = LOS.getVisibilityTable(playerx, playery)
