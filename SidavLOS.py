@@ -1,6 +1,4 @@
-#TODO: get rid of dependencies
 #import Routines.TdlConsoleWrapper as CW
-#TODO: Optimisation for faster work.
 
 _lastFromX = _lastFromY = -1
 _lastVisibilityTable = [[]]
@@ -70,16 +68,45 @@ def _straightLOSCheck(fromx, fromy, tox, toy):
             return False
     return True
 
+def fullLOSLineCheck(fromx, fromy, viewRange = -1):
+    #Very experimental alternate first stage
+    #The difference is that this first-stage variant is MUCH faster (approx 20 times faster!)
+    #it also has the vision range check.
+    #  TODO: add out of bounds check
+    mapW = len(_visionObstructingMap)
+    mapH = len(_visionObstructingMap[0])
+    fullView = [[False] * (mapH) for _ in range(mapW)]
+    for bx in range(mapW):
+        for by in range(mapH):
+            if 0 < bx < mapW-1 and 0 < by < mapH-1:
+                continue
+            #print ("x{} y{}".format(bx, by))
+            line = get_line(fromx, fromy, bx, by)
+            lineLength = len(line)
+            for i, currCell in enumerate(line):
+                x = currCell.x
+                y = currCell.y
+                # if (x < 0 or y < 0 or x > mapW - 1 or y > mapH - 1):
+                #     return False
+                if (x-fromx)**2 + (y-fromy)**2 > viewRange ** 2 and viewRange != -1:
+                    break
+                if _visionObstructingMap[x][y] == False and i < lineLength - 1:
+                    fullView[x][y] = True
+                else:
+                    fullView[x][y] = True
+                    break
+    return fullView
+
 def _checkNeighbouringTiles(x, y, firstStageTable): #checks if the tile has some first-stage-visible neighbours
     mapW = len(firstStageTable)
     mapH = len(firstStageTable[0])
     for i in [-1, 0, 1]:
         for j in [-1, 0, 1]:
-            if x+i < 0 or x+i >= mapW or y+j < 0 or y+j >= mapH:
+            if not ((0 < x+i < mapW) and (0 < y+j < mapH)):
                 continue
             if abs(i*j) == 1:
                 continue
-            if not _visionObstructingMap[x+i][y+j] and firstStageTable[x+i][y+j]:
+            if firstStageTable[x+i][y+j] and not _visionObstructingMap[x+i][y+j]:
                 return True
     return False
 
@@ -90,10 +117,11 @@ def getVisibilityTable(fromx, fromy):
     mapH = len(_visionObstructingMap[0])
     resultingMap = [[False] * (mapH) for _ in range(mapW)]
     #first stage
-    firstStage = [[False] * (mapH) for _ in range(mapW)]
-    for i in range(mapW):
-        for j in range(mapH):
-            firstStage[i][j] = _straightLOSCheck(fromx, fromy, i, j)
+    #firstStage = [[False] * (mapH) for _ in range(mapW)]
+    # for i in range(mapW):
+    #     for j in range(mapH):
+    #         firstStage[i][j] = _straightLOSCheck(fromx, fromy, i, j)
+    firstStage = fullLOSLineCheck(fromx, fromy)
     #second stage
     secondStage = [[False] * (mapH) for _ in range(mapW)]
     for i in range(mapW):
@@ -118,7 +146,10 @@ def visibleLineExists(fromx, fromy, tox, toy):
     if fromx < 0 or fromx >= mapW or fromy < 0 or fromy >= mapH:
         return False
     if fromx == _lastFromX and fromy == _lastFromY and _lastVisibilityTable != [[]]:
-        return bool(_lastVisibilityTable[tox][toy])
+        try:
+            return bool(_lastVisibilityTable[tox][toy])
+        except:
+            print("PROBLEM: tox = {}, toy = {}".format(tox, toy))
     else:
         _lastFromX = fromx
         _lastFromY = fromy
