@@ -21,14 +21,17 @@ def randVertDir(): #What a shame.
 TOTAL_LAND_AUTOMS = 8
 TOTAL_MNT_AUTOMS = 5
 TOTAL_FOREST_AUTOMS = 12
+TOTAL_FIELD_AUTOMS = 5
 LAND_CYCLES = 650
 MNT_CYCLES = 175
 FOREST_CYCLES = 50
+FIELD_CYCLES = 10
 _SINGLE_ELEMENT_PLACEMENT_TRIES = 100000
 _WATER_CODE = '~'
 _GROUND_CODE = '.'
 _MOUNTAIN_CODE = '^'
 _FOREST_CODE = 'f'
+_FIELD_CODE = '"'
 _TOWN_CODE = 'O'
 _MILITARY_BASE_CODE = '%'
 _LAB_CODE = '&'
@@ -111,7 +114,6 @@ def addSingleElement(maparr, elemCode, neighbours:list, neighborMinNumber:list, 
                 x = random(1, mapW - 1)
                 y = random(1, mapH - 1)
                 for i in range(currentPlacingElementNumber):
-                    print(currentPlacingElementNumber)
                     if (x-placedXcoords[i]) ** 2 + (y - placedYcoords[i]) ** 2 < minDistance ** 2:
                         distanceSatisfied = False
                         break
@@ -143,6 +145,8 @@ def drawMap(maparr):
                 setForegroundColor(200, 200, 200)
             elif maparr[i][j] == _FOREST_CODE:
                 setForegroundColor(0, 255, 64)
+            elif maparr[i][j] == _FIELD_CODE:
+                setForegroundColor(220, 220, 0)
             elif maparr[i][j] == _TOWN_CODE:
                 setForegroundColor(255, 128, 255)
             elif maparr[i][j] == _MILITARY_BASE_CODE:
@@ -156,11 +160,16 @@ def doCALandshit(mapW, mapH):
     #land
     addLandscapeElements(maparr, TOTAL_LAND_AUTOMS, _GROUND_CODE, [_WATER_CODE], LAND_CYCLES, False)
     #mountains
-    addLandscapeElements(maparr, TOTAL_MNT_AUTOMS, _MOUNTAIN_CODE, [_GROUND_CODE], MNT_CYCLES, minDistanceToMapBorder=5)
+    addLandscapeElements(maparr, TOTAL_MNT_AUTOMS, _MOUNTAIN_CODE, [_GROUND_CODE], MNT_CYCLES,
+                         minDistanceToMapBorder=5)
     # forest
-    addLandscapeElements(maparr, TOTAL_FOREST_AUTOMS, _FOREST_CODE, [_GROUND_CODE, _MOUNTAIN_CODE], FOREST_CYCLES, minDistanceToMapBorder=5)
+    addLandscapeElements(maparr, TOTAL_FOREST_AUTOMS, _FOREST_CODE, [_GROUND_CODE, _MOUNTAIN_CODE], FOREST_CYCLES,
+                         minDistanceToMapBorder=5)
+    #fields
+    addLandscapeElements(maparr, TOTAL_FIELD_AUTOMS, _FIELD_CODE, [_GROUND_CODE, _FOREST_CODE], FIELD_CYCLES,
+                         minDistanceToMapBorder=5)
     # towns
-    Neigh = [_FOREST_CODE, _MOUNTAIN_CODE, _WATER_CODE]
+    Neigh = [_FOREST_CODE, _FIELD_CODE, _WATER_CODE]
     NeighNum = [1, 1, 1]
     addSingleElement(maparr, _TOWN_CODE, Neigh, NeighNum, elemCount=5, minDistance=7)
     # Military
