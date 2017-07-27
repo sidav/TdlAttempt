@@ -22,10 +22,10 @@ TOTAL_LAND_AUTOMS = 8
 TOTAL_MNT_AUTOMS = 5
 TOTAL_FOREST_AUTOMS = 12
 TOTAL_FIELD_AUTOMS = 5
-LAND_CYCLES = 650
+LAND_CYCLES = 620
 MNT_CYCLES = 175
 FOREST_CYCLES = 50
-FIELD_CYCLES = 10
+FIELD_CYCLES = 15
 #_SINGLE_ELEMENT_PLACEMENT_TRIES = 10000
 _WATER_CODE = '~'
 _GROUND_CODE = '.'
@@ -96,7 +96,7 @@ def countSurroundings(maparr, x, y, code): #returns the number of given surround
 
 
 #Crap, but working
-def _OLD_CODE_tryAddSingleElements(maparr, elemCode, neighbours:list, neighborMinNumber:list, elemCount:int, minDistance = 2):
+def tryRandomlyAddSingleElements(maparr, elemCode, neighbours:list, neighborMinNumber:list, elemCount:int, minDistance = 2):
     _SINGLE_ELEMENT_PLACEMENT_TRIES = 500
     #adds some single-tile element (i.e. town, military base...) on the random map
     mapW = len(maparr)
@@ -105,7 +105,6 @@ def _OLD_CODE_tryAddSingleElements(maparr, elemCode, neighbours:list, neighborMi
     y = 0
     placedXcoords = [0] * (elemCount+1) #coords of already placed elems
     placedYcoords = [0] * (elemCount+1) #coords of already placed elems
-    print("{}, fuck {}".format(len(placedYcoords), elemCount))
     totalPlaced = 0
 
     for currentPlacingElementNumber in range(elemCount+1):
@@ -133,12 +132,12 @@ def _OLD_CODE_tryAddSingleElements(maparr, elemCode, neighbours:list, neighborMi
                 continue
             #place elems, add placed coords to the array.
             maparr[x][y] = elemCode
-            placedXcoords[currentPlacingElementNumber] = x
-            placedYcoords[currentPlacingElementNumber] = y
+            if (currentPlacingElementNumber != elemCount):
+                placedXcoords[currentPlacingElementNumber] = x
+                placedYcoords[currentPlacingElementNumber] = y
             totalPlaced += 1
             break
     if totalPlaced < elemCount:
-        print("Placed {}, needed {}".format(totalPlaced, elemCount))
         return False
     return True
 
@@ -175,7 +174,7 @@ def tryAddSingleElements(maparr, elemCode, neighbours:list, neighborMinNumber:li
                     if not distanceSatisfied:
                         break
                 if not distanceSatisfied:
-                    x += currSquareDist//2
+                    x += currSquareDist//4
                     continue
             #Checking necessary neighbouring tiles condition.
             for i, currentCheck in enumerate(neighbours):
@@ -187,11 +186,12 @@ def tryAddSingleElements(maparr, elemCode, neighbours:list, neighborMinNumber:li
                 continue
             #place elems, add placed coords to the arrays.
             maparr[x][y] = elemCode
-            placedXcoords[currentPlacingElementNumber] = x
-            placedYcoords[currentPlacingElementNumber] = y
+            if (currentPlacingElementNumber != elemCount):
+                placedXcoords[currentPlacingElementNumber] = x
+                placedYcoords[currentPlacingElementNumber] = y
             totalPlaced += 1
             break
-    if totalPlaced < elemCount-1:
+    if totalPlaced < elemCount:
         return False
     return True
 
@@ -218,40 +218,34 @@ def drawMap(maparr):
             putChar(maparr[i][j], i, j)
 
 def doCALandshit(mapW, mapH):
-    trynum = 0
     while True:
-        trynum += 1
-        print("{}th try started...".format(trynum))
         maparr = [[_WATER_CODE] * (mapH) for _ in range(mapW)]
         #land
-        addLandscapeElements(maparr, TOTAL_LAND_AUTOMS, _GROUND_CODE, [_WATER_CODE], LAND_CYCLES, True, minDistanceToMapBorder=8)
+        addLandscapeElements(maparr, TOTAL_LAND_AUTOMS, _GROUND_CODE, [_WATER_CODE], LAND_CYCLES, False, minDistanceToMapBorder=8)
         #mountains
         addLandscapeElements(maparr, TOTAL_MNT_AUTOMS, _MOUNTAIN_CODE, [_GROUND_CODE], MNT_CYCLES,
-                             minDistanceToMapBorder=5)
+                             minDistanceToMapBorder=4)
         # forest
         addLandscapeElements(maparr, TOTAL_FOREST_AUTOMS, _FOREST_CODE, [_GROUND_CODE, _MOUNTAIN_CODE], FOREST_CYCLES,
-                             minDistanceToMapBorder=5)
+                             minDistanceToMapBorder=4)
         #fields
         addLandscapeElements(maparr, TOTAL_FIELD_AUTOMS, _FIELD_CODE, [_GROUND_CODE, _FOREST_CODE], FIELD_CYCLES,
                              minDistanceToMapBorder=2)
         # towns
-        Neigh = [_FOREST_CODE, _FIELD_CODE]
-        NeighNum = [1, 2]
-        if not _OLD_CODE_tryAddSingleElements(maparr, _TOWN_CODE, Neigh, NeighNum, elemCount=5, minDistance=7):
+        Neigh = [_FIELD_CODE]
+        NeighNum = [3]
+        if not tryAddSingleElements(maparr, _TOWN_CODE, Neigh, NeighNum, elemCount=TOTAL_FIELD_AUTOMS, minDistance=7):
             continue
-        print("Towns success")
         # Military
         Neigh = [_GROUND_CODE]
         NeighNum = [7]
         if not tryAddSingleElements(maparr, _MILITARY_BASE_CODE, Neigh, NeighNum, 2, minDistance=15):
             continue
-        print("military success")
         # Labs
         Neigh = [_MOUNTAIN_CODE]
         NeighNum = [7]
         if not tryAddSingleElements(maparr, _LAB_CODE, Neigh, NeighNum, 2, minDistance=7):
             continue
-        print("Labs success")
         break
     #TODO: delete following dbg output:
     setForegroundColor(255, 255, 255)
