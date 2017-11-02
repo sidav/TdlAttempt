@@ -2,6 +2,7 @@
 # import os
 # import tdl
 from ConsoleWrapper import *
+import RBRDungeonGenerator
 import BSPDungeonGenerator
 #from BSPDungeonGenerator import generateMap
 from CADungeonGenerator import doCAshit
@@ -18,7 +19,7 @@ playery = SCREEN_HEIGHT // 2
 map = [[]]
 exit_game = False
 Re_generate = True
-generator = 0
+generator = 3
 
 def keys():
     global playerx, playery, exit_game, Re_generate, generator
@@ -33,7 +34,7 @@ def keys():
     if (keypressed.key == 'ENTER'):
         randomize()
         generator+=1
-        if generator > 2:
+        if generator > 3:
             generator = 0
         Re_generate = True
 
@@ -55,6 +56,10 @@ def main():
                 map = doCAshit() #It's the cave generator shit
                 setForegroundColor(200, 100, 30)
                 putString("Cave CA Generator", 0, 0)
+            elif generator == 3:
+                map = RBRDungeonGenerator.getMap()
+                setForegroundColor(200, 100, 30)
+                putString("Room-By-Room Generator", 0, 0)
             Re_generate = False
         #drawRect(3,1,10,10)
         if generator != 0:
