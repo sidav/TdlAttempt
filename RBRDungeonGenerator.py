@@ -23,7 +23,7 @@ def _rand(mod):                                                             #
 #############################################################################
 
 _MAP_WIDTH = 80
-_MAP_HEIGHT = 20
+_MAP_HEIGHT = 25
 
 _MIN_ROOM_SIZE = 2
 _MAX_ROOM_SIZE = 10
@@ -33,8 +33,30 @@ _WALL_CODE = '#'
 _DOOR_CODE = '+'
 
 
-def placeRoom(self):
-    pass
+class _Coordinate:
+    x = y = 0
+    def __init__(self):
+        self.x = _random(0, _MAP_WIDTH)
+        self.y = _random(0, _MAP_HEIGHT)
+
+
+def fillRoom(maparr, x, y, w, h, char): # fill rect for room
+    for i in range (x, x+w):
+        for j in range (y, y+h):
+            maparr[i][j] = char
+
+
+def findWallForDoor(maparr):
+    for _ in range(1000):
+        # first, take a look at a random cell
+        x = _random(0, _MAP_WIDTH)
+        y = _random(0, _MAP_HEIGHT)
+        # check if it's a wall
+        if maparr[x][y] != _WALL_CODE:
+            continue
+        # let's check if it is "thick" wall
+        if () or ():
+
 
 
 def placeInitialRoom(maparr):
