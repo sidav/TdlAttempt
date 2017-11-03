@@ -25,37 +25,107 @@ def _rand(mod):                                                             #
 _MAP_WIDTH = 80
 _MAP_HEIGHT = 25
 
+_MAX_PLACEMENT_TRIES = 1000
+
 _MIN_ROOM_SIZE = 2
 _MAX_ROOM_SIZE = 10
+_MIN_CORRIDOR_LENGTH = 3
+_MAX_CORRIDOR_LENGTH = 10
+
+_MAX_CORRIDORS_COUNT = 25
+_MAX_ROOMS_COUNT = 15
 
 _FLOOR_CODE = ' '
 _WALL_CODE = '#'
-_DOOR_CODE = '+'
+_DOOR_CODE = '\''
 
 
-class _Coordinate:
+class _Vector:
     x = y = 0
-    def __init__(self):
-        self.x = _random(0, _MAP_WIDTH)
-        self.y = _random(0, _MAP_HEIGHT)
+
+    def __init__(self, x = None, y = None):
+
+        if x is None or y is None:
+            self.x = _random(0, _MAP_WIDTH-1)
+            self.y = _random(0, _MAP_HEIGHT-1)
+        else:
+            self.x = x
+            self.y = y
+
+####################################################
 
 
-def fillRoom(maparr, x, y, w, h, char): # fill rect for room
+def dig(maparr, x, y, w, h, char=_FLOOR_CODE): # fill rect with char
     for i in range (x, x+w):
         for j in range (y, y+h):
-            maparr[i][j] = char
+            if (0 <= i < _MAP_WIDTH and 0 <= j < _MAP_HEIGHT):
+                maparr[i][j] = char
 
 
-def findWallForDoor(maparr):
-    for _ in range(1000):
-        # first, take a look at a random cell
-        x = _random(0, _MAP_WIDTH)
-        y = _random(0, _MAP_HEIGHT)
-        # check if it's a wall
-        if maparr[x][y] != _WALL_CODE:
+def isWall(maparr, x, y, w=1, h=1):
+    for i in range (x, x+w):
+        for j in range(y, y+h):
+            if maparr[x][y] != _WALL_CODE:
+                return False
+    return True
+
+
+def pickDirectionForDigging(maparr, x, y):
+    direction = None
+    if x >= _MAP_WIDTH or y >= _MAP_HEIGHT:
+        print("!!!Oh noes! Coordinates cheburachnulis at ${0}, ${1}!!!".format(x, y))
+        #return _Vector(0, 0)
+    if maparr[x][y+1] == _FLOOR_CODE:
+        direction = _Vector(0, -1)
+    elif maparr[x-1][y] == _FLOOR_CODE:
+        direction = _Vector(1, 0)
+    elif maparr[x][y-1] == _FLOOR_CODE:
+        direction = _Vector(0, 1)
+    elif maparr[x+1][y] == _FLOOR_CODE:
+        direction = _Vector(-1, 0)
+    else:
+        print("!!!no valid direction for digging at ${0}, ${1}!!!".format(x, y))
+        direction = _Vector(0, 0)
+    return direction
+
+
+def tryAddCorridor(maparr):
+    #TODO: add space emptiness check before corridor placement
+    for tries in range (_MAX_PLACEMENT_TRIES):
+        currCell = _Vector()
+        corrLength = _random(_MIN_CORRIDOR_LENGTH, _MAX_CORRIDOR_LENGTH)
+
+        while not isWall(maparr, currCell.x, currCell.y):
+            currCell = _Vector()
+
+        digDirection = pickDirectionForDigging(maparr, currCell.x, currCell.y)
+        if digDirection.x == digDirection.y == 0:
             continue
-        # let's check if it is "thick" wall
-        if () or ():
+        maparr[currCell.x][currCell.y] = _DOOR_CODE
+        dirx = digDirection.x
+        diry = digDirection.y
+        print("corrlen = {0}".format(corrLength))
+        if dirx == 1:
+            dig(maparr, currCell.x+1, currCell.y, corrLength, 1)
+        elif dirx == -1:
+            dig(maparr, currCell.x-corrLength, currCell.y, corrLength, 1)
+        elif diry == 1:
+            dig(maparr, currCell.x, currCell.y+1, 1, corrLength)
+        elif diry == -1:
+            dig(maparr, currCell.x, currCell.y-corrLength, 1, corrLength)
+        return
+
+
+# def findWallForDoor(maparr):
+#     for _ in range(1000):
+#         # first, take a look at a random cell
+#         x = _random(0, _MAP_WIDTH)
+#         y = _random(0, _MAP_HEIGHT)
+#         # check if it's a wall
+#         if maparr[x][y] != _WALL_CODE:
+#             continue
+#         # let's check if it is "thick" wall
+#         if () or ():
 
 
 
@@ -76,6 +146,10 @@ def generateDungeon():
     maparr = [[_WALL_CODE] * (_MAP_HEIGHT + 1) for _ in range(_MAP_WIDTH + 1)]
     # Place the random room in center of the map.
     placeInitialRoom(maparr)
+    #TODO: all the other shit
+    for _ in range(1):
+        tryAddCorridor(maparr)
+
     return maparr
 
 
