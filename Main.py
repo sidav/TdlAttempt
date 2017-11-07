@@ -74,7 +74,7 @@ def main():
                         obstrMap[i][j] = False
             LOS.setvisionObstructingMap(obstrMap)
             #visMap = LOS.getVisibilityTable(playerx, playery)
-            setForegroundColor(12, 12, 72)
+            setForegroundColor(48, 48, 128)
             drawCharArray(map)
             for i in range(len(map)):
                 for j in range(len(map[0])):
