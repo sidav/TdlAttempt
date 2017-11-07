@@ -27,13 +27,13 @@ _MAP_HEIGHT = 25
 
 _MAX_PLACEMENT_TRIES = 1000
 
-_MIN_ROOM_SIZE = 2
+_MAX_CORRIDORS_COUNT = 150
+_MAX_ROOMS_COUNT = 50
+
+_MIN_ROOM_SIZE = 3
 _MAX_ROOM_SIZE = 10
 _MIN_CORRIDOR_LENGTH = 3
 _MAX_CORRIDOR_LENGTH = 10
-
-_MAX_CORRIDORS_COUNT = 25
-_MAX_ROOMS_COUNT = 15
 
 _FLOOR_CODE = ' '
 _WALL_CODE = '#'
@@ -87,7 +87,6 @@ def pickDirectionForDigging(maparr, x, y):
     elif maparr[x+1][y] == _FLOOR_CODE:
         direction = _Vector(-1, 0)
     else:
-        print("!!!no valid direction for digging at ${0}, ${1}!!!".format(x, y))
         direction = _Vector(0, 0)
     return direction
 
@@ -101,31 +100,69 @@ def tryAddCorridor(maparr):
             currCell = _Vector()
 
         digDirection = pickDirectionForDigging(maparr, currCell.x, currCell.y)
-        if digDirection.x == digDirection.y == 0:
-            continue
         dirx = digDirection.x
         diry = digDirection.y
-        if dirx == 1:
+        if dirx == diry == 0:
+            continue
+
+        if dirx == 1: # dig right
             if isWall(maparr, currCell.x+1, currCell.y-1, corrLength, 3):
                 dig(maparr, currCell.x+1, currCell.y, corrLength, 1)
                 maparr[currCell.x][currCell.y] = _DOOR_CODE
                 return
-        elif dirx == -1:
+        elif dirx == -1: # dig left
             if isWall(maparr, currCell.x-corrLength, currCell.y-1, corrLength, 3):
                 dig(maparr, currCell.x-corrLength, currCell.y, corrLength, 1)
                 maparr[currCell.x][currCell.y] = _DOOR_CODE
                 return
-        elif diry == 1:
+        elif diry == 1: # dig down
             if isWall(maparr, currCell.x-1, currCell.y+1, 3, corrLength):
                 dig(maparr, currCell.x, currCell.y+1, 1, corrLength)
                 maparr[currCell.x][currCell.y] = _DOOR_CODE
                 return
-        elif diry == -1:
+        elif diry == -1: # dig up
             if isWall(maparr, currCell.x-1, currCell.y-corrLength, 3, corrLength):
                 dig(maparr, currCell.x, currCell.y-corrLength, 1, corrLength)
                 maparr[currCell.x][currCell.y] = _DOOR_CODE
                 return
 
+
+def tryAddRoom(maparr):
+    for tries in range (_MAX_PLACEMENT_TRIES):
+        currCell = _Vector()
+        roomW = _random(_MIN_ROOM_SIZE, _MAX_ROOM_SIZE)
+        roomH = _random(_MIN_ROOM_SIZE, _MAX_ROOM_SIZE)
+        horOffset = _random(0, roomW-1)
+        vertOffset = _random(0, roomH-1)
+        while not isWall(maparr, currCell.x, currCell.y):
+            currCell = _Vector()
+
+        digDirection = pickDirectionForDigging(maparr, currCell.x, currCell.y)
+        dirx = digDirection.x
+        diry = digDirection.y
+        if dirx == diry == 0:
+            continue
+        #TODO: add dig up/down restrictions (i.e. there should be more "digged horizontally" rooms than "digged vertically" ones)
+        if dirx == 1: # dig right
+            if isWall(maparr, currCell.x, currCell.y-vertOffset-1, roomW+2, roomH+2):
+                dig(maparr, currCell.x+1, currCell.y-vertOffset, roomW, roomH)
+                maparr[currCell.x][currCell.y] = _DOOR_CODE
+                return
+        elif dirx == -1: # dig left
+            if isWall(maparr, currCell.x-roomW-1, currCell.y-vertOffset-1, roomW+2, roomH+2):
+                dig(maparr, currCell.x-roomW, currCell.y-vertOffset, roomW, roomH)
+                maparr[currCell.x][currCell.y] = _DOOR_CODE
+                return
+        elif diry == 1: # dig down
+            if isWall(maparr, currCell.x-horOffset-1, currCell.y, roomW+2, roomH+2):
+                dig(maparr, currCell.x-horOffset, currCell.y+1, roomW, roomH)
+                maparr[currCell.x][currCell.y] = _DOOR_CODE
+                return
+        elif diry == -1: # dig up
+            if isWall(maparr, currCell.x-horOffset-1, currCell.y-roomH-1, roomW+2, roomH+2):
+                dig(maparr, currCell.x-horOffset, currCell.y-roomH, roomW, roomH)
+                maparr[currCell.x][currCell.y] = _DOOR_CODE
+                return
 
 # def findWallForDoor(maparr):
 #     for _ in range(1000):
@@ -158,8 +195,15 @@ def generateDungeon():
     # Place the random room in center of the map.
     placeInitialRoom(maparr)
     #TODO: all the other shit
-    for _ in range(5):
-        tryAddCorridor(maparr)
+    currentRoomsCount = 0
+    currentCorrsCount = 0
+    while currentRoomsCount < _MAX_ROOMS_COUNT or currentCorrsCount < _MAX_CORRIDORS_COUNT:
+        if currentCorrsCount < _MAX_CORRIDORS_COUNT:
+            tryAddCorridor(maparr)
+            currentCorrsCount += 1
+        if currentRoomsCount < _MAX_ROOMS_COUNT:
+            tryAddRoom(maparr)
+            currentRoomsCount += 1
 
     return maparr
 
