@@ -27,13 +27,13 @@ _MAP_HEIGHT = 25
 
 _MAX_PLACEMENT_TRIES = 1000
 
-_MAX_CORRIDORS_COUNT = 100
+_MAX_CORRIDORS_COUNT = 60
 _MAX_ROOMS_COUNT = 25
 
 _MIN_ROOM_SIZE = 3
 _MAX_ROOM_SIZE = 15
 _MIN_CORRIDOR_LENGTH = 2
-_MAX_CORRIDOR_LENGTH = 10
+_MAX_CORRIDOR_LENGTH = 80
 
 _FLOOR_CODE = ' '
 _WALL_CODE = '#'
@@ -92,6 +92,8 @@ def pickDirectionForDigging(maparr, x, y):
 
 
 def tryAddCorridor(maparr):
+    #TODO: Maybe ALLOW corridors to lead into existing rooms?
+    #TODO: i.e. disable the "corridor ending tile emptiness check"?
     for tries in range (_MAX_PLACEMENT_TRIES):
         currCell = _Vector()
         corrLength = _random(_MIN_CORRIDOR_LENGTH, _MAX_CORRIDOR_LENGTH)
@@ -106,22 +108,22 @@ def tryAddCorridor(maparr):
             continue
 
         if dirx == 1: # dig right
-            if isWall(maparr, currCell.x+1, currCell.y-1, corrLength, 3):
+            if isWall(maparr, currCell.x, currCell.y-1, corrLength+2, 3):
                 dig(maparr, currCell.x+1, currCell.y, corrLength, 1)
                 maparr[currCell.x][currCell.y] = _DOOR_CODE
                 return
         elif dirx == -1: # dig left
-            if isWall(maparr, currCell.x-corrLength, currCell.y-1, corrLength, 3):
+            if isWall(maparr, currCell.x-corrLength-1, currCell.y-1, corrLength+2, 3):
                 dig(maparr, currCell.x-corrLength, currCell.y, corrLength, 1)
                 maparr[currCell.x][currCell.y] = _DOOR_CODE
                 return
         elif diry == 1: # dig down
-            if isWall(maparr, currCell.x-1, currCell.y+1, 3, corrLength):
+            if isWall(maparr, currCell.x-1, currCell.y, 3, corrLength+2):
                 dig(maparr, currCell.x, currCell.y+1, 1, corrLength)
                 maparr[currCell.x][currCell.y] = _DOOR_CODE
                 return
         elif diry == -1: # dig up
-            if isWall(maparr, currCell.x-1, currCell.y-corrLength, 3, corrLength):
+            if isWall(maparr, currCell.x-1, currCell.y-corrLength-1, 3, corrLength+2):
                 dig(maparr, currCell.x, currCell.y-corrLength, 1, corrLength)
                 maparr[currCell.x][currCell.y] = _DOOR_CODE
                 return
