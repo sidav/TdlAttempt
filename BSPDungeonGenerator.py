@@ -27,7 +27,7 @@ _SPLITS = 12
 
 _FLOOR_CODE = ' '
 _WALL_CODE = '#'
-_DOOR_CODE = '+'
+_DOOR_CODE = '\\'
 
 class treeNode:
     def __init__(self, parent=None, cont=None):

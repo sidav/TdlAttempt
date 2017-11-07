@@ -69,7 +69,7 @@ def main():
             for i, row in enumerate(map):
                 for j, col in enumerate(map[0]):
                     if map[i][j] == BSPDungeonGenerator._DOOR_CODE:
-                        map[i][j] = BSPDungeonGenerator._FLOOR_CODE
+                        obstrMap[i][j] = False
                     if map[i][j] == BSPDungeonGenerator._FLOOR_CODE:
                         obstrMap[i][j] = False
             LOS.setvisionObstructingMap(obstrMap)
