@@ -109,17 +109,17 @@ def tryAddCorridor(maparr):
 
         # TODO: add dig up/down restrictions (i.e. there should be more "digged horizontally" corridors than "digged vertically" ones)
         if dirx == 1: # dig right
-            if isWall(maparr, currCell.x, currCell.y-1, corrLength, 3):
+            if isWall(maparr, currCell.x, currCell.y-1, corrLength+1, 3):
                 dig(maparr, currCell.x+1, currCell.y, corrLength, 1)
                 maparr[currCell.x][currCell.y] = _DOOR_CODE
                 return
         elif dirx == -1: # dig left
-            if isWall(maparr, currCell.x-corrLength-1, currCell.y-1, corrLength, 3):
+            if isWall(maparr, currCell.x-corrLength-1, currCell.y-1, corrLength+1, 3):
                 dig(maparr, currCell.x-corrLength, currCell.y, corrLength, 1)
                 maparr[currCell.x][currCell.y] = _DOOR_CODE
                 return
         elif diry == 1: # dig down
-            if isWall(maparr, currCell.x-1, currCell.y, 3, corrLength):
+            if isWall(maparr, currCell.x-1, currCell.y, 3, corrLength+1):
                 dig(maparr, currCell.x, currCell.y+1, 1, corrLength)
                 maparr[currCell.x][currCell.y] = _DOOR_CODE
                 return
