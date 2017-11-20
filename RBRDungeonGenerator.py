@@ -97,7 +97,7 @@ def digRoomWithInnerRoom(maparr, x, y, w, h): # digs a room with a smaller room 
 
 def digCircularRoom(maparr, x, y, w, h):
     #TODO: maybe empty outer space around the room?
-
+    #TODO: fix wrong corridor placement into the room.
     # w and h should be equal, odd and greater than 5.
     # make w and h equal
     if w < h:
