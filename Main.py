@@ -6,7 +6,7 @@ import RBRDungeonGenerator
 import BSPDungeonGenerator
 #from BSPDungeonGenerator import generateMap
 from CADungeonGenerator import doCAshit
-from CALandscapeGenerator import doCALandshit
+from CALandscapeGenerator import generateMap
 import SidavLOS as LOS
 
 from SidavRandom import *
@@ -45,7 +45,7 @@ def main():
         if Re_generate:
             clearConsole()
             if generator == 0:
-                doCALandshit(80, 25) #It's the landscape generator's shit.
+                generateMap(80, 25) #It's the landscape generator's shit.
                 setForegroundColor(200,100,30)
                 putString("CA Landscape Generator", 0, 0)
             if generator == 1:

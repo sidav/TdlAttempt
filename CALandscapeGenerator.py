@@ -1,15 +1,33 @@
-from SidavRandom import * #Can be deleted if the following wrapper will be handled
+# from SidavRandom import * #Can be deleted if the following wrapper will be handled
 from ConsoleWrapper import drawCharArray, setForegroundColor, putChar
 
 
-def random(min, max): #IT'S JUST A WRAPPER. Min, max inclusive!
-    return rand(max-min+1)+min
+#############################################################################
+def _random(min, max): #IT'S JUST A WRAPPER. Min, max inclusive!            #
+    return _rand(max-min+1)+min                                             #
+                                                                            #
+_LCG_X = None                                                               #
+                                                                            #
+def setRandomSeed(seed):                                                    # FOR TEH GREAT INDEPENDENCY!
+    global _LCG_X                                                           #
+    _LCG_X = seed                                                           #
+                                                                            #
+def _rand(mod):                                                             #
+    global _LCG_X                                                           #
+    if _LCG_X is None:                                                      #
+        _LCG_X = 7355608                                                    #
+    LCG_A = 14741                                                           #
+    LCG_C = 757                                                             #
+    LCG_M = 77777677777                                                     #
+    _LCG_X = (LCG_A*_LCG_X + LCG_C) % LCG_M                                 #
+    return _LCG_X%mod                                                       #
+#############################################################################
 
 def randHorDir(): #What a shame.
-    return random(-1, 1)
+    return _random(-1, 1)
 
 def randVertDir(): #What a shame.
-    val = random(0, 100)
+    val = _random(0, 100)
     if val < 30:
         return -1
     elif val > 70:
@@ -51,7 +69,7 @@ class Automata:
         dy = randVertDir()
         for _ in range(MAX_DIRECTION_TRIES):
             while dx*dy != 0 or dx == dy:
-                randomize()
+#                randomize()
                 dx = randHorDir()
                 dy = randVertDir()
             if (0 < self.x+dx < len(self.maparr)-2 and 0 < self.y+dy < len(self.maparr[0])-2) and self.maparr[self.x+dx][self.y+dy] in self.allowed:
@@ -66,11 +84,11 @@ def addLandscapeElements(maparr, automs, brush, allowed:list, cycles, randomPlac
     auts = []
     if randomPlacement:
         for i in range(1, automs + 1):
-            selx = random(0+minDistanceToMapBorder, mapW-minDistanceToMapBorder)
-            sely = random(0+minDistanceToMapBorder, mapH-minDistanceToMapBorder)
+            selx = _random(0+minDistanceToMapBorder, mapW-minDistanceToMapBorder)
+            sely = _random(0+minDistanceToMapBorder, mapH-minDistanceToMapBorder)
             while maparr[selx][sely] not in allowed:
-                selx = random(0 + minDistanceToMapBorder, mapW - minDistanceToMapBorder)
-                sely = random(0 + minDistanceToMapBorder, mapH - minDistanceToMapBorder)
+                selx = _random(0 + minDistanceToMapBorder, mapW - minDistanceToMapBorder)
+                sely = _random(0 + minDistanceToMapBorder, mapH - minDistanceToMapBorder)
             auts.append(Automata(selx, sely, maparr, brush, allowed))
     else:
         for i in range(1, automs+1):
@@ -114,8 +132,8 @@ def tryRandomlyAddSingleElements(maparr, elemCode, neighbours:list, neighborMinN
             #The following loop is the distance check.
             #Elems should not be placed closer than minDistance allows
             while not distanceSatisfied and currentPlacingElementNumber > 0:
-                x = random(1, mapW - 1)
-                y = random(1, mapH - 1)
+                x = _random(1, mapW - 1)
+                y = _random(1, mapH - 1)
                 for i in range(currentPlacingElementNumber):
                     if (x-placedXcoords[i]) ** 2 + (y - placedYcoords[i]) ** 2 < minDistance ** 2:
                         distanceSatisfied = False
@@ -158,7 +176,7 @@ def tryAddSingleElements(maparr, elemCode, neighbours:list, neighborMinNumber:li
         while True:
             successfulPlacement = True
             x += 1#random(1, mapW - 1)
-            #y = random(1, mapH - 1)
+            #y = _random(1, mapH - 1)
             if x >= mapW:
                 x = 0
                 y+=1
@@ -217,7 +235,7 @@ def drawMap(maparr):
                 setForegroundColor(0, 255, 255)
             putChar(maparr[i][j], i, j)
 
-def doCALandshit(mapW, mapH):
+def generateMap(mapW, mapH):
     while True:
         maparr = [[_WATER_CODE] * (mapH) for _ in range(mapW)]
         #land
