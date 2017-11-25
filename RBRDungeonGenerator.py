@@ -146,16 +146,37 @@ def digCircularOutlinedRoom(maparr, x, y, w, h):
                 maparr[i][j] = _WALL_CODE
 
 
+#########
+# # # # #
+#       #
+# # # # #
+#########
+def digLongRoom(maparr, x, y, w, h): #need to change the name.
+    dig(maparr, x, y, w, h)
+    if w < h:
+        for i in range(y+1, y+h-1, 2):
+            maparr[x][i] = _WALL_CODE
+            maparr[x+w-1][i] = _WALL_CODE
+    else:
+        for i in range(x+1, x+w-1, 2):
+            maparr[i][y] = _WALL_CODE
+            maparr[i][y+h-1] = _WALL_CODE
+
+
 def pickRoomAndDig(maparr, x, y, w, h):  # Subject for changes.
+    #roomIsDigged = False
     roomType = _random(0, 3)
-    if roomType == 0 or (w < 7 or h < 7):
-        dig(maparr, x, y, w, h)
-    elif roomType == 1:
-        digRoomWithInnerRoom(maparr, x, y, w, h)
-    elif roomType == 2:
-        digCircularRoom(maparr, x, y, w, h)
-    elif roomType == 3:
-        digCircularOutlinedRoom(maparr, x, y, w, h)
+    if (w >= 7 and h >= 7):
+        if roomType == 0:
+            digRoomWithInnerRoom(maparr, x, y, w, h)
+        elif roomType == 1:
+            digCircularRoom(maparr, x, y, w, h)
+        elif roomType == 2:
+            digCircularOutlinedRoom(maparr, x, y, w, h)
+    else:
+        if 0 < roomType < 2:
+            digLongRoom(maparr, x, y, w, h)
+        else: dig(maparr, x, y, w, h)
 
 def isWall(maparr, x, y, w=1, h=1):
     for i in range (x, x+w):
@@ -282,7 +303,8 @@ def placeInitialRoom(maparr):
     halfRoomH = int(roomH / 2)
     halfMapW = int(_MAP_WIDTH / 2)
     halfMapH = int(_MAP_HEIGHT / 2)
-    pickRoomAndDig(maparr, halfMapW - halfRoomW, halfMapH - halfRoomH, roomW, roomH)
+    #pickRoomAndDig(maparr, halfMapW - halfRoomW, halfMapH - halfRoomH, roomW, roomH)
+    digLongRoom(maparr, halfMapW - halfRoomW, halfMapH - halfRoomH, roomW, roomH)
 
 def generateDungeon():
     # Fill the map with solid walls.
@@ -290,7 +312,8 @@ def generateDungeon():
 
     TESTING_SHIT = 0
     if TESTING_SHIT == 1:
-        digCircularOutlinedRoom(maparr, 1, 1, 15, 15)
+        #digCircularOutlinedRoom(maparr, 1, 1, 15, 15)
+        digLongRoom(maparr, 1, 1, 3, 10)
 
 
     else:
