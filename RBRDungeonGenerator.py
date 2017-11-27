@@ -162,6 +162,26 @@ def digLongRoom(maparr, x, y, w, h): #need to change the name.
             maparr[i][y] = _WALL_CODE
             maparr[i][y+h-1] = _WALL_CODE
 
+###########
+# #   #   #
+#   #   # #
+###########
+def digSnakeRoom(maparr, x, y, w, h): #need to change the name.
+    obstacleWidth = 0
+    dig(maparr, x, y, w, h)
+    if w < h:
+        obstacleWidth = w - 1
+        for i in range(y+1, y+h-1, 4):
+            dig(maparr, x, i, obstacleWidth, 1, _WALL_CODE)
+            if i+2 < y+h:
+                dig(maparr, x+w-obstacleWidth, i+2, obstacleWidth, 1, _WALL_CODE)
+    else:
+        obstacleWidth = h - 1
+        for i in range(x+1, x+w-1, 4):
+            dig(maparr, i, y, 1, obstacleWidth, _WALL_CODE)
+            if i + 2 < x + w:
+                dig(maparr, i+2, y+h-obstacleWidth, 1, obstacleWidth, _WALL_CODE)
+
 
 def pickRoomAndDig(maparr, x, y, w, h):  # Subject for changes.
     #roomIsDigged = False
@@ -174,8 +194,10 @@ def pickRoomAndDig(maparr, x, y, w, h):  # Subject for changes.
         elif roomType == 2:
             digCircularOutlinedRoom(maparr, x, y, w, h)
     else:
-        if 0 < roomType < 2:
+        if roomType == 1:
             digLongRoom(maparr, x, y, w, h)
+        elif roomType == 2:
+            digSnakeRoom(maparr, x, y, w, h)
         else: dig(maparr, x, y, w, h)
 
 def isWall(maparr, x, y, w=1, h=1):
@@ -311,10 +333,14 @@ def generateDungeon():
     maparr = [[_WALL_CODE] * (_MAP_HEIGHT + 1) for _ in range(_MAP_WIDTH + 1)]
 
     TESTING_SHIT = 0
+
     if TESTING_SHIT == 1:
         #digCircularOutlinedRoom(maparr, 1, 1, 15, 15)
-        digLongRoom(maparr, 1, 1, 3, 10)
-
+        #digLongRoom(maparr, 1, 1, 3, 10)
+        digSnakeRoom(maparr, 1, 1, 2, 10)
+        digSnakeRoom(maparr, 5, 1, 3, 10)
+        digSnakeRoom(maparr, 1, 12, 10, 5)
+        digSnakeRoom(maparr, 12, 12, 10, 4)
 
     else:
         # Place the random room in center of the map.
