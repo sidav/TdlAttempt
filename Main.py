@@ -31,6 +31,8 @@ def keys():
     if (keypressed.key == 'RIGHT') or (keypressed.key == 'KP6'): playerx += 1
     if (keypressed.key == 'SPACE'):
         Re_generate = True
+    if (keypressed.key == 'CONTROL'):
+        print("player is at {0},{1}".format(playerx, playery))
     if (keypressed.key == 'ENTER'):
         randomize()
         generator+=1
