@@ -1,3 +1,6 @@
+import time # <--- Delete this when debug is not needed
+import ConsoleWrapper as Console # <- this too
+
 # Room-By-Room dungeon generator.
 # Was already implemented in C# for my "StealthRoguelike" prototype.
 
@@ -152,6 +155,7 @@ def digEllipticRoom(maparr, x, y, w, h, entryX, entryY):
         roomXRadius -= 1
     if h % 2 == 0:
         roomYRadius -= 1
+    entryCorrLength = (w if w > h else h)
     print("{0}, {1}".format(roomXRadius, roomYRadius))
     roomCenterX = x + roomXRadius
     roomCenterY = y + roomYRadius
@@ -163,7 +167,7 @@ def digEllipticRoom(maparr, x, y, w, h, entryX, entryY):
             currYComponent = (currRelativeCoordY ** 2) * (roomXRadius ** 2)
             if currXComponent + currYComponent <= (roomXRadius ** 2) * (roomYRadius ** 2):
                 maparr[i][j] = _FLOOR_CODE
-    digEntryCorridor(maparr, x, y, w, h, entryX, entryY, int(w/2)+1)
+    digEntryCorridor(maparr, x, y, w, h, entryX, entryY, entryCorrLength)
 
 
 def digCircularOutlinedRoom(maparr, x, y, w, h, entryX, entryY): # Square room with wall circle inside.
@@ -408,12 +412,11 @@ def generateDungeon():
     # Fill the map with solid walls.
     maparr = [[_WALL_CODE] * (_MAP_HEIGHT + 1) for _ in range(_MAP_WIDTH + 1)]
 
-    TESTING_SHIT = 0
+    TESTING_SHIT = 2
 
     if TESTING_SHIT == 1:
-        digRoomWithCross(maparr, 1, 1, 5, 5)
-        #digEllipticRoom(maparr, 1, 1, 7, 20, 35, 13)
-        #digCircularRoom(maparr, 27, 8, 8, 12, 35, 13)
+        #digRoomWithCross(maparr, 1, 1, 5, 5)
+        digEllipticRoom(maparr, 1, 1, 7, 20, 8, 22)
         #digSnakeRoom(maparr, 15, 1, 10, 12, 16, 0)
         #digCircularOutlinedRoom(maparr, 1, 1, 15, 15)
         #digLongRoom(maparr, 1, 1, 3, 10)
@@ -421,6 +424,10 @@ def generateDungeon():
         # digSnakeRoom(maparr, 5, 1, 3, 10)
         # digSnakeRoom(maparr, 1, 12, 10, 5)
         # digSnakeRoom(maparr, 12, 12, 10, 4)
+
+    elif TESTING_SHIT == 2:
+        for _ in range(10):
+            makeDebugCrap(maparr)
 
     else:
         # Place the random room in center of the map.
@@ -441,3 +448,32 @@ def generateDungeon():
 
 def getMap(): # FOR TESTING PURPOSES
     return generateDungeon()
+
+
+############ --- DEBUG DEBUG DEBUG --- #################
+# Everything below this comment should be safely deleted.
+
+def drawDungeon(maparr):
+    Console.drawCharArray(maparr)
+    Console.flushConsole()
+
+def makeDebugCrap(maparr):
+    placeInitialRoom(maparr)
+    drawDungeon(maparr)
+    time.sleep(1)
+    # TODO: all the other shit
+    currentRoomsCount = 1
+    currentCorrsCount = 0
+    while currentRoomsCount < _MAX_ROOMS_COUNT or currentCorrsCount < _MAX_CORRIDORS_COUNT:
+        if currentCorrsCount < _MAX_CORRIDORS_COUNT:
+            tryAddCorridor(maparr)
+            currentCorrsCount += 1
+            drawDungeon(maparr)
+            time.sleep(1)
+        if currentRoomsCount < _MAX_ROOMS_COUNT:
+            tryAddRoom(maparr)
+            currentRoomsCount += 1
+            drawDungeon(maparr)
+            time.sleep(1)
+    makeOutline(maparr, 0, 0, _MAP_WIDTH, _MAP_HEIGHT, _WALL_CODE)
+    time.sleep(3600)
