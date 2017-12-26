@@ -1,20 +1,33 @@
 import tdl
+from sys import exit as closeProgram
 
-SCREEN_WIDTH = 80#80
-SCREEN_HEIGHT = 25#25
+_SCREEN_WIDTH = 80#80 is default
+_SCREEN_HEIGHT = 25#25 is default
 
-LIMIT_FPS = 20  # 20 frames-per-second maximum
+_LIMIT_FPS = 10  # 20 frames-per-second maximum
 
 try:
     tdl.set_font('terminal8x12_gs_ro.png', greyscale=True, altLayout=False)
 except:
+    print("Oh fuck, the font is missing!")
     pass
 
-console = tdl.init(SCREEN_WIDTH, SCREEN_HEIGHT, title="TDL testing ground", fullscreen= False, renderer= "SDL")
+#console = tdl.init(_SCREEN_WIDTH, _SCREEN_HEIGHT, title="Roguelike", fullscreen= False, renderer= "SDL")
 FORECOLOR = (255,255,255)
 BACKCOLOR = (0, 0, 0)
 
 # LAST_KEY_PRESSED = tdl.event
+
+def initConsole(SW, SH, titleString):
+    global _SCREEN_WIDTH, _SCREEN_HEIGHT
+    _SCREEN_WIDTH = SW
+    _SCREEN_HEIGHT = SH
+    global console
+    console = tdl.init(SW, SH, title=titleString, fullscreen=False, renderer="SDL")
+    tdl.set_fps(_LIMIT_FPS)
+    clearConsole()
+    flushConsole()
+
 
 def putChar(char, x, y):
     console.draw_char(x, y, char, bg=BACKCOLOR, fg=FORECOLOR)
@@ -108,8 +121,22 @@ def drawRect(x0, y0, w, h):
 def drawCharArray(arr):
     for x in range(len(arr)):
         for y in range(len(arr[x])):
-            if x < SCREEN_WIDTH and y < SCREEN_HEIGHT:
+            if x < _SCREEN_WIDTH and y < _SCREEN_HEIGHT:
                 putChar(arr[x][y], x, y)
+
+
+def drawCharArrayAtPosition(arr, xpos, ypos, transpose=False):
+    if transpose:
+        for y in range(len(arr)):
+            putString(arr[y],xpos,y+ypos)
+            # for y in range(len(arr[x])):
+            #     if x < _SCREEN_WIDTH and y < _SCREEN_HEIGHT:
+            #         putChar(arr[x][y], y + ypos, x + xpos)
+    else:
+        for x in range(len(arr)):
+            for y in range(len(arr[x])):
+                if x < _SCREEN_WIDTH and y < _SCREEN_HEIGHT:
+                    putChar(arr[x][y], x+xpos, y+ypos)
 
 
 def setBackgroundColor(r, g, b):
@@ -117,9 +144,12 @@ def setBackgroundColor(r, g, b):
     BACKCOLOR = (r, g, b)
 
 
-def setForegroundColor(r, g, b):
+def setForegroundColor(r, g = -1, b = -1):
     global FORECOLOR
-    FORECOLOR = (r, g, b)
+    if g != -1 and b != -1:
+        FORECOLOR = (r, g, b)
+    else:
+        FORECOLOR = (r[0], r[1], r[2])
 
 
 
@@ -131,9 +161,20 @@ def clearConsole():
     console.clear(bg = (0, 0, 0), fg = (0, 0, 0))
 
 
+def isWindowClosed():
+    return tdl.event.is_window_closed()
+
+
 def readKey():
-    global LAST_KEY_PRESSED
-    LAST_KEY_PRESSED = tdl.event.key_wait()
-    return LAST_KEY_PRESSED
+    if not tdl.event.is_window_closed():
+        global LAST_KEY_PRESSED
+        while True:
+            LAST_KEY_PRESSED = tdl.event.key_wait()
+            if LAST_KEY_PRESSED.text != '' :
+                break
+        return LAST_KEY_PRESSED
+    else:
+        closeProgram(0)
 
-
+# def wait_for_key_press():
+#         pass
