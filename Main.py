@@ -14,6 +14,9 @@ from SidavRandom import *
 from SimplePathfinding import *
 from AStarPathfinding import *
 
+
+SCREEN_WIDTH = 80
+SCREEN_HEIGHT = 25
 playerx = SCREEN_WIDTH // 2
 playery = SCREEN_HEIGHT // 2
 map = [[]]
@@ -43,6 +46,7 @@ def keys():
 
 def main():
     global Re_generate, map
+    initConsole(SCREEN_WIDTH, SCREEN_HEIGHT, "TDL testing ground")
     while not tdl.event.is_window_closed(): # <--- not shit
         if Re_generate:
             clearConsole()
