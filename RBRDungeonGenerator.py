@@ -412,7 +412,7 @@ def generateDungeon():
     # Fill the map with solid walls.
     maparr = [[_WALL_CODE] * (_MAP_HEIGHT + 1) for _ in range(_MAP_WIDTH + 1)]
 
-    TESTING_SHIT = 2
+    TESTING_SHIT = 0
 
     if TESTING_SHIT == 1:
         #digRoomWithCross(maparr, 1, 1, 5, 5)
@@ -436,12 +436,13 @@ def generateDungeon():
         currentRoomsCount = 1
         currentCorrsCount = 0
         while currentRoomsCount < _MAX_ROOMS_COUNT or currentCorrsCount < _MAX_CORRIDORS_COUNT:
-            if currentCorrsCount < _MAX_CORRIDORS_COUNT:
-                tryAddCorridor(maparr)
-                currentCorrsCount += 1
-            if currentRoomsCount < _MAX_ROOMS_COUNT:
-                tryAddRoom(maparr)
-                currentRoomsCount += 1
+            for _ in range (100):
+                if _rand(10) < 4:
+                    tryAddCorridor(maparr)
+                    currentCorrsCount += 1
+                else:
+                    tryAddRoom(maparr)
+                    currentRoomsCount += 1
         makeOutline(maparr, 0, 0, _MAP_WIDTH, _MAP_HEIGHT, _WALL_CODE)
     return maparr
 

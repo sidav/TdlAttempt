@@ -21,3 +21,9 @@ def _rand(mod):                                                             #
     _LCG_X = (LCG_A*_LCG_X + LCG_C) % LCG_M                                 #
     return _LCG_X%mod                                                       #
 #############################################################################
+
+class Container:
+
+    def __init__(self):
+        pass
+
