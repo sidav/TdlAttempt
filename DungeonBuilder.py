@@ -1,5 +1,5 @@
 # Dungeon builder written in Python by Steve Wallace
-# Modified and lobotomized by sidav. 
+# Modified and lobotomized by sidav.
 # Class to produce random map layouts
 # from random import *
 from math import *

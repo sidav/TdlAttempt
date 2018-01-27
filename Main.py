@@ -23,7 +23,7 @@ playery = SCREEN_HEIGHT // 2
 map = [[]]
 exit_game = False
 Re_generate = True
-generator = 4
+generator = 3
 
 def keys():
     global playerx, playery, exit_game, Re_generate, generator
