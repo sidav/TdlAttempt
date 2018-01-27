@@ -22,7 +22,7 @@ playery = SCREEN_HEIGHT // 2
 map = [[]]
 exit_game = False
 Re_generate = True
-generator = 3
+generator = 4
 
 def keys():
     global playerx, playery, exit_game, Re_generate, generator
@@ -39,7 +39,7 @@ def keys():
     if (keypressed.key == 'ENTER'):
         randomize()
         generator+=1
-        if generator > 3:
+        if generator > 4:
             generator = 0
         Re_generate = True
 
@@ -66,31 +66,36 @@ def main():
                 map = RBRDungeonGenerator.getMap()
                 setForegroundColor(200, 100, 30)
                 putString("Room-By-Room Generator", 0, 0)
+            elif generator == 4:
+                setForegroundColor(200, 100, 30)
+                putString("New BSP generator.", 0, 0)
             Re_generate = False
         #drawRect(3,1,10,10)
-        if generator != 0:
-            ##FOLLOWING SHIT IS LOS TEST
-            clearConsole()
-            obstrMap = [[True] * (len(map[0])) for _ in range(len(map))]
-            for i, row in enumerate(map):
-                for j, col in enumerate(map[0]):
-                    if map[i][j] == BSPDungeonGenerator._DOOR_CODE:
-                        obstrMap[i][j] = False
-                    if map[i][j] == BSPDungeonGenerator._FLOOR_CODE:
-                        obstrMap[i][j] = False
-            LOS.setvisionObstructingMap(obstrMap)
-            #visMap = LOS.getVisibilityTable(playerx, playery)
-            setForegroundColor(48, 48, 128)
-            drawCharArray(map)
-            for i in range(len(map)):
-                for j in range(len(map[0])):
-                    if LOS.visibleLineExists(playerx, playery, i, j):
-                        setBackgroundColor(100, 100, 100)
-                        setForegroundColor(255,255,255)
-                        putChar(map[i][j], i, j)
-            setBackgroundColor(255, 0, 0)
-            putChar('@', playerx, playery)
-            setBackgroundColor(0, 0, 0)
+
+        # if generator != 0:
+        #     ##FOLLOWING SHIT IS LOS TEST
+        #     clearConsole()
+        #     obstrMap = [[True] * (len(map[0])) for _ in range(len(map))]
+        #     for i, row in enumerate(map):
+        #         for j, col in enumerate(map[0]):
+        #             if map[i][j] == BSPDungeonGenerator._DOOR_CODE:
+        #                 obstrMap[i][j] = False
+        #             if map[i][j] == BSPDungeonGenerator._FLOOR_CODE:
+        #                 obstrMap[i][j] = False
+        #     LOS.setvisionObstructingMap(obstrMap)
+        #     #visMap = LOS.getVisibilityTable(playerx, playery)
+        #     setForegroundColor(48, 48, 128)
+        #     drawCharArray(map)
+        #     for i in range(len(map)):
+        #         for j in range(len(map[0])):
+        #             if LOS.visibleLineExists(playerx, playery, i, j):
+        #                 setBackgroundColor(100, 100, 100)
+        #                 setForegroundColor(255,255,255)
+        #                 putChar(map[i][j], i, j)
+        #     setBackgroundColor(255, 0, 0)
+        #     putChar('@', playerx, playery)
+        #     setBackgroundColor(0, 0, 0)
+
             ##LOS TEST ENDS HERE
     #################
     #SHIT ENDS HERE.#

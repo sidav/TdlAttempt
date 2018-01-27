@@ -17,7 +17,7 @@ def setRandomSeed(seed):                                                    # FO
 def _rand(mod):                                                             #
     global _LCG_X                                                           #
     if _LCG_X is None:                                                      #
-        _LCG_X = 7355608                                                    #
+        _LCG_X = 39#7355608                                                    #
     LCG_A = 14741                                                           #
     LCG_C = 757                                                             #
     LCG_M = 77777677777                                                     #

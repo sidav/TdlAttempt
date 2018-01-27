@@ -3,7 +3,7 @@ For Linux:
     1. Install Python 3.5 (not sure about later versions, but versions prior to 3.5 won't work, I suppose).
        On Windows the project works on Python 3.6,  but I have not managed to run it in 3.6 on Linux.
 
-    2. Install the neccessary packages for Python via commands:
+    2. Install the necessary packages for Python via commands:
         $ sudo apt install gcc libsdl2-dev libffi-dev python-dev libomp-dev
         $ pip install tdl
 
