@@ -98,11 +98,11 @@ def digEntryCorridor(maparr, x, y, w, h, entryX, entryY, length=0): #needed for 
 
 def makeOutline(maparr, x, y, w, h, char=_WALL_CODE):
     for i in range(x,x+w):
-        maparr[i][y] = Tile(char, curr_key_level)
-        maparr[i][y+h-1] = Tile(char, curr_key_level)
+        maparr[i][y] = Tile(char, 0)
+        maparr[i][y+h-1] = Tile(char, 0)
     for j in range(y, y+h):
-        maparr[x][j] = Tile(char, curr_key_level)
-        maparr[x+w-1][j] = Tile(char, curr_key_level)
+        maparr[x][j] = Tile(char, 0)
+        maparr[x+w-1][j] = Tile(char, 0)
 
 
 def digRoomWithInnerRoom(maparr, x, y, w, h): # digs a room with a smaller room inside
