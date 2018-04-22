@@ -1,6 +1,7 @@
 import RBRDungeonGenerator
 import ConsoleWrapper as CW
 from Main import SCREEN_WIDTH, SCREEN_HEIGHT
+import time
 
 _WALL_CODE = chr(177)
 _FLOOR_CODE = '.'
@@ -22,12 +23,24 @@ tile_colors = {
     _OPDOOR_CODE: (128, 64, 0)
 }
 
+key_levels = {
+    0: (128, 128, 128),
+    1: (0, 128, 0),
+    2: (128, 0, 0),
+    3: (128, 0, 128)
+}
 
 def debug_RBR():
+    RBRDungeonGenerator.setRandomSeed(int(time.time()))
     map = RBRDungeonGenerator.generateDungeon(SCREEN_WIDTH, SCREEN_HEIGHT)
+
     for i in range(SCREEN_WIDTH):
         for j in range(SCREEN_HEIGHT):
-            CW.putChar(tile_names[map[i][j]], i, j)
+            tile_char = tile_names[map[i][j].char]
+            #CW.setForegroundColor(tile_colors[tile_char])
+            CW.setForegroundColor(key_levels[map[i][j].key_level])
+            CW.putChar(tile_char, i, j)
+
     CW.flushConsole()
     while not CW.isWindowClosed():
         CW.readKey()

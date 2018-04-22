@@ -22,6 +22,7 @@ def _rand(mod):                                                             #
     return _LCG_X%mod                                                       #
 #############################################################################
 
+
 _MAP_WIDTH = 80
 _MAP_HEIGHT = 25
 
@@ -38,6 +39,17 @@ _MAX_CORRIDOR_LENGTH = 10
 _FLOOR_CODE = 'floor'
 _WALL_CODE = 'wall'
 _DOOR_CODE = 'door'
+
+curr_key_level = 0
+
+
+class Tile:
+    char = 'wall'
+    key_level = 0
+    
+    def __init__(self, char, key_level=curr_key_level):
+        self.char = char
+        self.key_level = key_level
 
 
 class _Vector:
@@ -59,7 +71,7 @@ def dig(maparr, x, y, w, h, char=_FLOOR_CODE): # fill rect with char
     for i in range (x, x+w):
         for j in range (y, y+h):
             if (0 <= i < _MAP_WIDTH and 0 <= j < _MAP_HEIGHT):
-                maparr[i][j] = char
+                maparr[i][j] = Tile(char, curr_key_level)
 
 
 def digEntryCorridor(maparr, x, y, w, h, entryX, entryY, length=0): #needed for irregular shaped rooms
@@ -83,11 +95,11 @@ def digEntryCorridor(maparr, x, y, w, h, entryX, entryY, length=0): #needed for 
 
 def makeOutline(maparr, x, y, w, h, char=_WALL_CODE):
     for i in range(x,x+w):
-        maparr[i][y] = char
-        maparr[i][y+h-1] = char
+        maparr[i][y] = Tile(char, curr_key_level)
+        maparr[i][y+h-1] = Tile(char, curr_key_level)
     for j in range(y, y+h):
-        maparr[x][j] = char
-        maparr[x+w-1][j] = char
+        maparr[x][j] = Tile(char, curr_key_level)
+        maparr[x+w-1][j] = Tile(char, curr_key_level)
 
 
 def digRoomWithInnerRoom(maparr, x, y, w, h): # digs a room with a smaller room inside
@@ -111,7 +123,7 @@ def digRoomWithInnerRoom(maparr, x, y, w, h): # digs a room with a smaller room 
     else:
         doorY = y + innerRoomVertOffset + _random(1, innerRoomHeight - 2)
         doorX = x + innerRoomHorizOffset + _random(0, 1)*(innerRoomWidth - 1)
-    maparr[doorX][doorY] = _DOOR_CODE
+    maparr[doorX][doorY] = Tile(_DOOR_CODE, curr_key_level)
 
 
 # def digCircularRoom(maparr, x, y, w, h, entryX, entryY): #deprecated
@@ -163,7 +175,7 @@ def digEllipticRoom(maparr, x, y, w, h, entryX, entryY):
             currXComponent = (currRelativeCoordX ** 2) * (roomYRadius ** 2)
             currYComponent = (currRelativeCoordY ** 2) * (roomXRadius ** 2)
             if currXComponent + currYComponent <= (roomXRadius ** 2) * (roomYRadius ** 2):
-                maparr[i][j] = _FLOOR_CODE
+                maparr[i][j] = Tile(_FLOOR_CODE, curr_key_level)
     digEntryCorridor(maparr, x, y, w, h, entryX, entryY, entryCorrLength)
 
 
@@ -189,7 +201,7 @@ def digCircularOutlinedRoom(maparr, x, y, w, h, entryX, entryY): # Square room w
             currRelativeCoordX = i - roomCenterX
             currRelativeCoordY = j - roomCenterY
             if currRelativeCoordX ** 2 + currRelativeCoordY ** 2 <= roomRadius ** 2 and currRelativeCoordX ** 2 + currRelativeCoordY ** 2 >= (roomRadius-1) ** 2:
-                maparr[i][j] = _WALL_CODE
+                maparr[i][j] = Tile(_WALL_CODE, curr_key_level)
     digEntryCorridor(maparr, x, y, w, h, entryX, entryY)
 
 
@@ -205,13 +217,13 @@ def digRoomWithCross(maparr, x, y, w, h):
     roomMiddleX = x+int(w/2)
     roomMiddleY = y + int(h / 2)
     for i in range(x+1, x+w - 1):
-        maparr[i][roomMiddleY] = _WALL_CODE
+        maparr[i][roomMiddleY] = Tile(_WALL_CODE, curr_key_level)
         if h % 2 == 0:
-            maparr[i][roomMiddleY-1] = _WALL_CODE
+            maparr[i][roomMiddleY-1] = Tile(_WALL_CODE, curr_key_level)
     for i in range(y+1, y+h - 1):
-        maparr[roomMiddleX][i] = _WALL_CODE
+        maparr[roomMiddleX][i] = Tile(_WALL_CODE, curr_key_level)
         if w % 2 == 0:
-            maparr[roomMiddleX-1][i] = _WALL_CODE
+            maparr[roomMiddleX-1][i] = Tile(_WALL_CODE, curr_key_level)
 
 
 
@@ -224,12 +236,12 @@ def digLongRoom(maparr, x, y, w, h): #need to change the name.
     dig(maparr, x, y, w, h)
     if w < h:
         for i in range(y+1, y+h-1, 2):
-            maparr[x][i] = _WALL_CODE
-            maparr[x+w-1][i] = _WALL_CODE
+            maparr[x][i] = Tile(_WALL_CODE, curr_key_level)
+            maparr[x+w-1][i] = Tile(_WALL_CODE, curr_key_level)
     else:
         for i in range(x+1, x+w-1, 2):
-            maparr[i][y] = _WALL_CODE
-            maparr[i][y+h-1] = _WALL_CODE
+            maparr[i][y] = Tile(_WALL_CODE, curr_key_level)
+            maparr[i][y+h-1] = Tile(_WALL_CODE, curr_key_level)
 
 
 ###########
@@ -281,7 +293,7 @@ def isWall(maparr, x, y, w=1, h=1):
     for i in range (x, x+w):
         for j in range(y, y+h):
             if 0 < i < _MAP_WIDTH-1 and 0 < j < _MAP_HEIGHT-1:
-                if maparr[i][j] != _WALL_CODE:
+                if maparr[i][j].char != _WALL_CODE:
                     return False
             else:
                 return  False
@@ -293,13 +305,13 @@ def pickDirectionForDigging(maparr, x, y):
     if x >= _MAP_WIDTH or y >= _MAP_HEIGHT:
         print("!!!Oh noes! Coordinates cheburachnulis at ${0}, ${1}!!!".format(x, y))
         #return _Vector(0, 0)
-    if maparr[x][y+1] == _FLOOR_CODE:
+    if maparr[x][y+1].char == _FLOOR_CODE:
         direction = _Vector(0, -1)
-    elif maparr[x-1][y] == _FLOOR_CODE:
+    elif maparr[x-1][y].char == _FLOOR_CODE:
         direction = _Vector(1, 0)
-    elif maparr[x][y-1] == _FLOOR_CODE:
+    elif maparr[x][y-1].char == _FLOOR_CODE:
         direction = _Vector(0, 1)
-    elif maparr[x+1][y] == _FLOOR_CODE:
+    elif maparr[x+1][y].char == _FLOOR_CODE:
         direction = _Vector(-1, 0)
     else:
         direction = _Vector(0, 0)
@@ -326,22 +338,22 @@ def tryAddCorridor(maparr):
         if dirx == 1: # dig right
             if isWall(maparr, currCell.x, currCell.y-1, corrLength, 3):
                 dig(maparr, currCell.x+1, currCell.y, corrLength, 1)
-                maparr[currCell.x][currCell.y] = _DOOR_CODE
+                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
         elif dirx == -1: # dig left
             if isWall(maparr, currCell.x-corrLength-1, currCell.y-1, corrLength, 3):
                 dig(maparr, currCell.x-corrLength, currCell.y, corrLength, 1)
-                maparr[currCell.x][currCell.y] = _DOOR_CODE
+                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
         elif diry == 1: # dig down
             if isWall(maparr, currCell.x-1, currCell.y, 3, corrLength):
                 dig(maparr, currCell.x, currCell.y+1, 1, corrLength)
-                maparr[currCell.x][currCell.y] = _DOOR_CODE
+                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
         elif diry == -1: # dig up
             if isWall(maparr, currCell.x-1, currCell.y-corrLength, 3, corrLength):
                 dig(maparr, currCell.x, currCell.y-corrLength, 1, corrLength)
-                maparr[currCell.x][currCell.y] = _DOOR_CODE
+                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
 
 
@@ -364,22 +376,22 @@ def tryAddRoom(maparr):
         if dirx == 1: # dig right
             if isWall(maparr, currCell.x, currCell.y-vertOffset-1, roomW+2, roomH+2):
                 pickRoomAndDig(maparr, currCell.x+1, currCell.y-vertOffset, roomW, roomH, currCell.x, currCell.y)
-                maparr[currCell.x][currCell.y] = _DOOR_CODE
+                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
         elif dirx == -1: # dig left
             if isWall(maparr, currCell.x-roomW-1, currCell.y-vertOffset-1, roomW+2, roomH+2):
                 pickRoomAndDig(maparr, currCell.x-roomW, currCell.y-vertOffset, roomW, roomH, currCell.x, currCell.y)
-                maparr[currCell.x][currCell.y] = _DOOR_CODE
+                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
         elif diry == 1: # dig down
             if isWall(maparr, currCell.x-horOffset-1, currCell.y, roomW+2, roomH+2):
                 pickRoomAndDig(maparr, currCell.x-horOffset, currCell.y+1, roomW, roomH, currCell.x, currCell.y)
-                maparr[currCell.x][currCell.y] = _DOOR_CODE
+                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
         elif diry == -1: # dig up
             if isWall(maparr, currCell.x-horOffset-1, currCell.y-roomH-1, roomW+2, roomH+2):
                 pickRoomAndDig(maparr, currCell.x-horOffset, currCell.y-roomH, roomW, roomH, currCell.x, currCell.y)
-                maparr[currCell.x][currCell.y] = _DOOR_CODE
+                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
 
 # def findWallForDoor(maparr):
@@ -398,15 +410,35 @@ def count_walls_around(maparr, x, y):
     walls = 0
     for i in [x-1, x, x+1]:
         for j in [y-1, y, y+1]:
-            if maparr[i][j] == _WALL_CODE:
+            if maparr[i][j].char == _WALL_CODE:
                 walls += 1
     return walls
+
+
+def get_highest_key_level_around(maparr, x, y):
+    lvl = 0
+    for i in [x-1, x, x+1]:
+        for j in [y-1, y, y+1]:
+            if maparr[i][j].key_level > lvl:
+                lvl = maparr[i][j].key_level
+    return lvl
+
+
+def is_neighbouring_with_different_key_levels(maparr, x, y):
+    lvl = maparr[x-1][y-1].key_level
+    for i in [x-1, x, x+1]:
+        for j in [y-1, y, y+1]:
+            if maparr[i][j].key_level != lvl:
+                print("{}, {} IS neighbouring!".format(i, j))
+                return True
+        print("{}, {} IS NOT neighbouring!".format(i, j))
+    return False
 
 
 def try_add_more_doors(maparr):
     for x in range (2, _MAP_WIDTH - 2):
         for y in range(2, _MAP_HEIGHT - 2):
-            if maparr[x][y] == _FLOOR_CODE:
+            if maparr[x][y].char == _FLOOR_CODE:
                 curr_walls = count_walls_around(maparr, x, y)
                 if curr_walls == 6:
                     chance = 15
@@ -414,24 +446,25 @@ def try_add_more_doors(maparr):
                     chance = 95
                 if curr_walls >= 6:
                     # try up
-                    if maparr[x][y-2] == _FLOOR_CODE and maparr[x][y-1] == _WALL_CODE and _rand(100) < chance:
-                        maparr[x][y - 1] = _DOOR_CODE
+                    if maparr[x][y-2].char == _FLOOR_CODE and maparr[x][y-1].char == _WALL_CODE and _rand(100) < chance:
+                        maparr[x][y - 1] = Tile(_DOOR_CODE, get_highest_key_level_around(maparr, x, y-1))
                     # down
-                    if maparr[x][y+2] == _FLOOR_CODE and maparr[x][y+1] == _WALL_CODE and _rand(100) < chance:
-                        maparr[x][y + 1] = _DOOR_CODE
+                    if maparr[x][y+2].char == _FLOOR_CODE and maparr[x][y+1].char == _WALL_CODE and _rand(100) < chance:
+                        maparr[x][y + 1] = Tile(_DOOR_CODE, get_highest_key_level_around(maparr, x, y+1))
                     # right
-                    if maparr[x+2][y] == _FLOOR_CODE and maparr[x+1][y] == _WALL_CODE and _rand(100) < chance:
-                        maparr[x+1][y] = _DOOR_CODE
+                    if maparr[x+2][y].char == _FLOOR_CODE and maparr[x+1][y].char == _WALL_CODE and _rand(100) < chance:
+                        maparr[x+1][y] = Tile(_DOOR_CODE, get_highest_key_level_around(maparr, x+1, y))
                     # left
-                    if maparr[x-2][y] == _FLOOR_CODE and maparr[x-1][y] == _WALL_CODE and _rand(100) < chance:
-                        maparr[x-1][y] = _DOOR_CODE
+                    if maparr[x-2][y].char == _FLOOR_CODE and maparr[x-1][y].char == _WALL_CODE and _rand(100) < chance:
+                        maparr[x-1][y] = Tile(_DOOR_CODE, get_highest_key_level_around(maparr, x-1, y))
 
 
 def remove_some_doors(maparr):
     for x in range (_MAP_WIDTH):
         for y in range(_MAP_HEIGHT):
-            if maparr[x][y] == _DOOR_CODE and _rand(100) < 30:
-                maparr[x][y] = _FLOOR_CODE
+            if maparr[x][y].char == _DOOR_CODE and _rand(100) < 60 and not is_neighbouring_with_different_key_levels(maparr, x, y):
+                maparr[x][y] = Tile(_FLOOR_CODE)
+
 
 def placeInitialRoom(maparr):
     roomW = _random(_MIN_ROOM_SIZE, _MAX_ROOM_SIZE)
@@ -444,17 +477,22 @@ def placeInitialRoom(maparr):
     digLongRoom(maparr, halfMapW - halfRoomW, halfMapH - halfRoomH, roomW, roomH)
 
 def generateDungeon(mapw, maph):
-    global _MAP_WIDTH, _MAP_HEIGHT
+    global _MAP_WIDTH, _MAP_HEIGHT, curr_key_level
     _MAP_WIDTH = mapw
     _MAP_HEIGHT = maph
     # Fill the map with solid walls.
-    maparr = [[_WALL_CODE] * (_MAP_HEIGHT + 1) for _ in range(_MAP_WIDTH + 1)]
+    maparr = [[Tile(_WALL_CODE)] * (_MAP_HEIGHT + 1) for _ in range(_MAP_WIDTH + 1)]
     # Place the random room in center of the map.
     placeInitialRoom(maparr)
     #TODO: all the other shit
     currentRoomsCount = 1
     currentCorrsCount = 0
     while currentRoomsCount < _MAX_ROOMS_COUNT or currentCorrsCount < _MAX_CORRIDORS_COUNT:
+
+        curr_key_level = int((currentRoomsCount / _MAX_ROOMS_COUNT * 3))
+        if curr_key_level == 3:
+            curr_key_level = 2
+
         if currentCorrsCount < _MAX_CORRIDORS_COUNT:
             tryAddCorridor(maparr)
             currentCorrsCount += 1
