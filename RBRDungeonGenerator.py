@@ -482,13 +482,13 @@ def placeInitialRoom(maparr):
 
 def place_stairs(maparr):
     x = y = 0
-    while (maparr[x][y].char != _FLOOR_CODE or maparr[x][y].key_level != 0):
+    while (maparr[x][y].char != _FLOOR_CODE or maparr[x][y].key_level != 0 or count_walls_around(maparr, x, y) > 3):
         x = _random(2, _MAP_WIDTH - 2)
         y = _random(2, _MAP_HEIGHT - 2)
     maparr[x][y].char = _DOWN_STAIRS_CODE
     print('{},{} DSTAIRS'.format(x, y))
 
-    while (maparr[x][y].char != _FLOOR_CODE or maparr[x][y].key_level != 2):  # TODO: replace 2 with not shit
+    while (maparr[x][y].char != _FLOOR_CODE or maparr[x][y].key_level != 2 or count_walls_around(maparr, x, y) > 3):  # TODO: replace .key_level != 2 with not shit
         x = _random(2, _MAP_WIDTH - 2)
         y = _random(2, _MAP_HEIGHT - 2)
     maparr[x][y].char = _UP_STAIRS_CODE
@@ -511,9 +511,9 @@ def generateDungeon(mapw, maph, max_key_levels=2):
     while currentRoomsCount < _MAX_ROOMS_COUNT or currentCorrsCount < _MAX_CORRIDORS_COUNT:
 
         curr_key_level = int((currentRoomsCount / _MAX_ROOMS_COUNT * 10))
-        if 0 <= curr_key_level <= 0:
+        if 0 <= curr_key_level <= 1:
             curr_key_level = 0
-        elif 1 <= curr_key_level <= 4:
+        elif 2 <= curr_key_level <= 4:
             curr_key_level = 1
         elif 5 <= curr_key_level <= 10:
             curr_key_level = 2
