@@ -1,6 +1,3 @@
-import time # <--- Delete this when debug is not needed
-import ConsoleWrapper as Console # <- this too
-
 # Room-By-Room dungeon generator.
 # Was already implemented in C# for my "StealthRoguelike" prototype.
 
@@ -20,7 +17,7 @@ def _rand(mod):                                                             #
         _LCG_X = 39#7355608                                                    #
     LCG_A = 14741                                                           #
     LCG_C = 757                                                             #
-    LCG_M = 7777767777                                                     #
+    LCG_M = 77777677777                                                     #
     _LCG_X = (LCG_A*_LCG_X + LCG_C) % LCG_M                                 #
     return _LCG_X%mod                                                       #
 #############################################################################
@@ -38,9 +35,9 @@ _MAX_ROOM_SIZE = 15
 _MIN_CORRIDOR_LENGTH = 2
 _MAX_CORRIDOR_LENGTH = 10
 
-_FLOOR_CODE = ' '
-_WALL_CODE = '#'
-_DOOR_CODE = '\\'#'\''
+_FLOOR_CODE = 'floor'
+_WALL_CODE = 'wall'
+_DOOR_CODE = 'door'
 
 
 class _Vector:
@@ -396,6 +393,7 @@ def tryAddRoom(maparr):
 #         # let's check if it is "thick" wall
 #         if () or ():
 
+
 def count_walls_around(maparr, x, y):
     walls = 0
     for i in [x-1, x, x+1]:
@@ -404,28 +402,36 @@ def count_walls_around(maparr, x, y):
                 walls += 1
     return walls
 
+
 def try_add_more_doors(maparr):
     for x in range (2, _MAP_WIDTH - 2):
         for y in range(2, _MAP_HEIGHT - 2):
             if maparr[x][y] == _FLOOR_CODE:
                 curr_walls = count_walls_around(maparr, x, y)
                 if curr_walls == 6:
-                    chance = 1
+                    chance = 15
                 else:
-                    chance = 4
+                    chance = 95
                 if curr_walls >= 6:
                     # try up
-                    if maparr[x][y-2] == _FLOOR_CODE and maparr[x][y-1] == _WALL_CODE and _rand(10) < chance:
-                        maparr[x][y - 1] = '+' # _DOOR_CODE
+                    if maparr[x][y-2] == _FLOOR_CODE and maparr[x][y-1] == _WALL_CODE and _rand(100) < chance:
+                        maparr[x][y - 1] = _DOOR_CODE
                     # down
-                    if maparr[x][y+2] == _FLOOR_CODE and maparr[x][y+1] == _WALL_CODE and _rand(10) < chance:
-                        maparr[x][y + 1] = '+' # _DOOR_CODE
+                    if maparr[x][y+2] == _FLOOR_CODE and maparr[x][y+1] == _WALL_CODE and _rand(100) < chance:
+                        maparr[x][y + 1] = _DOOR_CODE
                     # right
-                    if maparr[x+2][y] == _FLOOR_CODE and maparr[x+1][y] == _WALL_CODE and _rand(10) < chance:
-                        maparr[x+1][y] = '+' # _DOOR_CODE
+                    if maparr[x+2][y] == _FLOOR_CODE and maparr[x+1][y] == _WALL_CODE and _rand(100) < chance:
+                        maparr[x+1][y] = _DOOR_CODE
                     # left
-                    if maparr[x-2][y] == _FLOOR_CODE and maparr[x-1][y] == _WALL_CODE and _rand(10) < chance:
-                        maparr[x-1][y] = '+' # _DOOR_CODE
+                    if maparr[x-2][y] == _FLOOR_CODE and maparr[x-1][y] == _WALL_CODE and _rand(100) < chance:
+                        maparr[x-1][y] = _DOOR_CODE
+
+
+def remove_some_doors(maparr):
+    for x in range (_MAP_WIDTH):
+        for y in range(_MAP_HEIGHT):
+            if maparr[x][y] == _DOOR_CODE and _rand(100) < 30:
+                maparr[x][y] = _FLOOR_CODE
 
 def placeInitialRoom(maparr):
     roomW = _random(_MIN_ROOM_SIZE, _MAX_ROOM_SIZE)
@@ -437,74 +443,27 @@ def placeInitialRoom(maparr):
     #pickRoomAndDig(maparr, halfMapW - halfRoomW, halfMapH - halfRoomH, roomW, roomH)
     digLongRoom(maparr, halfMapW - halfRoomW, halfMapH - halfRoomH, roomW, roomH)
 
-def generateDungeon():
+def generateDungeon(mapw, maph):
+    global _MAP_WIDTH, _MAP_HEIGHT
+    _MAP_WIDTH = mapw
+    _MAP_HEIGHT = maph
     # Fill the map with solid walls.
     maparr = [[_WALL_CODE] * (_MAP_HEIGHT + 1) for _ in range(_MAP_WIDTH + 1)]
-
-    TESTING_SHIT = 0
-
-    if TESTING_SHIT == 1:
-        #digRoomWithCross(maparr, 1, 1, 5, 5)
-        digEllipticRoom(maparr, 1, 1, 7, 20, 8, 22)
-        #digSnakeRoom(maparr, 15, 1, 10, 12, 16, 0)
-        #digCircularOutlinedRoom(maparr, 1, 1, 15, 15)
-        #digLongRoom(maparr, 1, 1, 3, 10)
-        # digSnakeRoom(maparr, 1, 1, 2, 10)
-        # digSnakeRoom(maparr, 5, 1, 3, 10)
-        # digSnakeRoom(maparr, 1, 12, 10, 5)
-        # digSnakeRoom(maparr, 12, 12, 10, 4)
-
-    elif TESTING_SHIT == 2:
-        for _ in range(10):
-            makeDebugCrap(maparr)
-
-    else:
-        # Place the random room in center of the map.
-        placeInitialRoom(maparr)
-        #TODO: all the other shit
-        currentRoomsCount = 1
-        currentCorrsCount = 0
-        while currentRoomsCount < _MAX_ROOMS_COUNT or currentCorrsCount < _MAX_CORRIDORS_COUNT:
-            for _ in range (100):
-                if _rand(10) < 3:
-                    tryAddCorridor(maparr)
-                    currentCorrsCount += 1
-                else:
-                    tryAddRoom(maparr)
-                    currentRoomsCount += 1
-        try_add_more_doors(maparr)
-        makeOutline(maparr, 0, 0, _MAP_WIDTH, _MAP_HEIGHT, _WALL_CODE)
-    return maparr
-
-
-def getMap(): # FOR TESTING PURPOSES
-    return generateDungeon()
-
-
-############ --- DEBUG DEBUG DEBUG --- #################
-# Everything below this comment should be safely deleted.
-
-def drawDungeon(maparr):
-    Console.drawCharArray(maparr)
-    Console.flushConsole()
-
-def makeDebugCrap(maparr):
+    # Place the random room in center of the map.
     placeInitialRoom(maparr)
-    drawDungeon(maparr)
-    time.sleep(1)
-    # TODO: all the other shit
+    #TODO: all the other shit
     currentRoomsCount = 1
     currentCorrsCount = 0
     while currentRoomsCount < _MAX_ROOMS_COUNT or currentCorrsCount < _MAX_CORRIDORS_COUNT:
         if currentCorrsCount < _MAX_CORRIDORS_COUNT:
             tryAddCorridor(maparr)
             currentCorrsCount += 1
-            drawDungeon(maparr)
-            time.sleep(1)
         if currentRoomsCount < _MAX_ROOMS_COUNT:
             tryAddRoom(maparr)
             currentRoomsCount += 1
-            drawDungeon(maparr)
-            time.sleep(1)
+
+    try_add_more_doors(maparr)
+    remove_some_doors(maparr)
+
     makeOutline(maparr, 0, 0, _MAP_WIDTH, _MAP_HEIGHT, _WALL_CODE)
-    time.sleep(3600)
+    return maparr

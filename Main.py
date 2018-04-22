@@ -9,6 +9,7 @@ from CADungeonGenerator import doCAshit
 from CALandscapeGenerator import generateMap
 from DungeonBuilder import get_dungeon
 import SidavLOS as LOS
+import Debugger_for_RBR_generator
 
 from SidavRandom import *
 #DELETE FOLLOWING AFTER DEBUG:
@@ -48,6 +49,9 @@ def keys():
 def main():
     global Re_generate, map
     initConsole(SCREEN_WIDTH, SCREEN_HEIGHT, "TDL testing ground")
+
+    Debugger_for_RBR_generator.debug_RBR()
+
     while not tdl.event.is_window_closed(): # <--- not shit
         if Re_generate:
             clearConsole()
@@ -64,7 +68,7 @@ def main():
                 setForegroundColor(200, 100, 30)
                 putString("Cave CA Generator", 0, 0)
             elif generator == 3:
-                map = RBRDungeonGenerator.getMap()
+                map = RBRDungeonGenerator.generateDungeon(SCREEN_WIDTH, SCREEN_HEIGHT)
                 setForegroundColor(200, 100, 30)
                 putString("Room-By-Room Generator", 0, 0)
             elif generator == 4:
