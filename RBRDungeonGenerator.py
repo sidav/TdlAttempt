@@ -431,7 +431,7 @@ def is_neighbouring_with_different_key_levels(maparr, x, y):
     lvl = maparr[x-1][y-1].key_level
     for i in [x-1, x, x+1]:
         for j in [y-1, y, y+1]:
-            if maparr[i][j].key_level != lvl:
+            if maparr[i][j].key_level != lvl and maparr[i][j].char != _WALL_CODE:  # Walls doesn't count
                 print("{}, {} IS neighbouring!".format(i, j))
                 return True
         print("{}, {} IS NOT neighbouring!".format(i, j))
