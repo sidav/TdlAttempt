@@ -12,7 +12,9 @@ _OPDOOR_CODE = '\\'
 tile_names = {
     'wall': _WALL_CODE,
     'floor': _FLOOR_CODE,
-    'door': _CLDOOR_CODE
+    'door': _CLDOOR_CODE,
+    'ustairs' : '>',
+    'dstairs': '<'
 }
 
 

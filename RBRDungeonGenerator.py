@@ -39,6 +39,9 @@ _MAX_CORRIDOR_LENGTH = 10
 _FLOOR_CODE = 'floor'
 _WALL_CODE = 'wall'
 _DOOR_CODE = 'door'
+_KEY_KEEPER_CODE = 'kkeeper'
+_DOWN_STAIRS_CODE = 'dstairs'
+_UP_STAIRS_CODE = 'ustairs'
 
 curr_key_level = 0
 
@@ -476,7 +479,25 @@ def placeInitialRoom(maparr):
     #pickRoomAndDig(maparr, halfMapW - halfRoomW, halfMapH - halfRoomH, roomW, roomH)
     digLongRoom(maparr, halfMapW - halfRoomW, halfMapH - halfRoomH, roomW, roomH)
 
-def generateDungeon(mapw, maph):
+
+def place_stairs(maparr):
+    x = y = 0
+    while (maparr[x][y].char != _FLOOR_CODE or maparr[x][y].key_level != 0):
+        x = _random(2, _MAP_WIDTH - 2)
+        y = _random(2, _MAP_HEIGHT - 2)
+    maparr[x][y].char = _DOWN_STAIRS_CODE
+    print('{},{} DSTAIRS'.format(x, y))
+
+    while (maparr[x][y].char != _FLOOR_CODE or maparr[x][y].key_level != 2):  # TODO: replace 2 with not shit
+        x = _random(2, _MAP_WIDTH - 2)
+        y = _random(2, _MAP_HEIGHT - 2)
+    maparr[x][y].char = _UP_STAIRS_CODE
+    print('{},{} USTAIRS'.format(x, y))
+
+
+def generateDungeon(mapw, maph, max_key_levels=2):
+    for i in range(3, 3):
+        print('fuck')
     global _MAP_WIDTH, _MAP_HEIGHT, curr_key_level
     _MAP_WIDTH = mapw
     _MAP_HEIGHT = maph
@@ -489,8 +510,12 @@ def generateDungeon(mapw, maph):
     currentCorrsCount = 0
     while currentRoomsCount < _MAX_ROOMS_COUNT or currentCorrsCount < _MAX_CORRIDORS_COUNT:
 
-        curr_key_level = int((currentRoomsCount / _MAX_ROOMS_COUNT * 3))
-        if curr_key_level == 3:
+        curr_key_level = int((currentRoomsCount / _MAX_ROOMS_COUNT * 10))
+        if 0 <= curr_key_level <= 0:
+            curr_key_level = 0
+        elif 1 <= curr_key_level <= 4:
+            curr_key_level = 1
+        elif 5 <= curr_key_level <= 10:
             curr_key_level = 2
 
         if currentCorrsCount < _MAX_CORRIDORS_COUNT:
@@ -502,6 +527,8 @@ def generateDungeon(mapw, maph):
 
     try_add_more_doors(maparr)
     remove_some_doors(maparr)
+
+    place_stairs(maparr)
 
     makeOutline(maparr, 0, 0, _MAP_WIDTH, _MAP_HEIGHT, _WALL_CODE)
     return maparr
