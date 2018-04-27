@@ -478,13 +478,13 @@ def update_doors_key_levels(maparr): # shitty workaround
 
 
 def generateDungeon(mapw, maph, max_key_levels=2):
-    for i in range(3, 3):
-        print('fuck')
     global _MAP_WIDTH, _MAP_HEIGHT, curr_key_level
     _MAP_WIDTH = mapw
     _MAP_HEIGHT = maph
     # Fill the map with solid walls.
     maparr = [[Tile(_WALL_CODE)] * (_MAP_HEIGHT + 1) for _ in range(_MAP_WIDTH + 1)]
+    # reset key level
+    curr_key_level = 0
     # Place the random room in center of the map.
     placeInitialRoom(maparr)
     #TODO: all the other shit
@@ -507,6 +507,8 @@ def generateDungeon(mapw, maph, max_key_levels=2):
             tryAddRoom(maparr)
             currentRoomsCount += 1
 
+        draw_shit(maparr) # <----- DELETE IT
+
     try_add_more_doors(maparr)
 
     update_doors_key_levels(maparr)
@@ -516,3 +518,48 @@ def generateDungeon(mapw, maph, max_key_levels=2):
 
     makeOutline(maparr, 0, 0, _MAP_WIDTH, _MAP_HEIGHT, _WALL_CODE)
     return maparr
+
+# DELETE EVERYTHING BELOW:
+
+def draw_shit(maparr):
+    import ConsoleWrapper as CW
+    import time
+
+    _WALL_CODE = chr(177)
+    _FLOOR_CODE = '.'
+    _CLDOOR_CODE = '+'
+    _OPDOOR_CODE = '\\'
+
+
+    tile_names = {
+        'wall': _WALL_CODE,
+        'floor': _FLOOR_CODE,
+        'door': _CLDOOR_CODE,
+        'ustairs' : '>',
+        'dstairs': '<'
+    }
+
+
+    tile_colors = {
+        _WALL_CODE: (128, 128, 128),
+        _FLOOR_CODE: (64, 64, 64),
+        _CLDOOR_CODE: (128, 128, 128),
+        _OPDOOR_CODE: (128, 64, 0)
+    }
+
+    key_levels = {
+        0: (128, 128, 128),
+        1: (0, 128, 0),
+        2: (128, 0, 0),
+        3: (128, 0, 128)
+    }
+
+    for i in range(_MAP_WIDTH):
+        for j in range(_MAP_HEIGHT):
+            tile_char = tile_names[maparr[i][j].char]
+            # CW.setForegroundColor(tile_colors[tile_char])
+            CW.setForegroundColor(key_levels[maparr[i][j].key_level])
+            CW.putChar(tile_char, i, j)
+
+    CW.flushConsole()
+    time.sleep(5)
