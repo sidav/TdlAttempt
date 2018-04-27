@@ -33,17 +33,17 @@ key_levels = {
 }
 
 def debug_RBR():
-    RBRDungeonGenerator.setRandomSeed(int(time.time()))
-    map = RBRDungeonGenerator.generateDungeon(SCREEN_WIDTH, SCREEN_HEIGHT)
-
-    for i in range(SCREEN_WIDTH):
-        for j in range(SCREEN_HEIGHT):
-            tile_char = tile_names[map[i][j].char]
-            #CW.setForegroundColor(tile_colors[tile_char])
-            CW.setForegroundColor(key_levels[map[i][j].key_level])
-            CW.putChar(tile_char, i, j)
-
-    CW.flushConsole()
     while not CW.isWindowClosed():
+        RBRDungeonGenerator.setRandomSeed(int(time.time()))
+        map = RBRDungeonGenerator.generateDungeon(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+        for i in range(SCREEN_WIDTH):
+            for j in range(SCREEN_HEIGHT):
+                tile_char = tile_names[map[i][j].char]
+                #CW.setForegroundColor(tile_colors[tile_char])
+                CW.setForegroundColor(key_levels[map[i][j].key_level])
+                CW.putChar(tile_char, i, j)
+
+        CW.flushConsole()
         CW.readKey()
 
