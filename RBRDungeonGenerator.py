@@ -470,6 +470,13 @@ def place_stairs(maparr):
     print('{},{} USTAIRS'.format(x, y))
 
 
+def update_doors_key_levels(maparr): # shitty workaround
+    for x in range(len(maparr)):
+        for y in range(len(maparr[0])):
+            if maparr[x][y].char == _DOOR_CODE:
+                maparr[x][y].key_level = get_highest_key_level_around(maparr, x, y)
+
+
 def generateDungeon(mapw, maph, max_key_levels=2):
     for i in range(3, 3):
         print('fuck')
@@ -501,6 +508,8 @@ def generateDungeon(mapw, maph, max_key_levels=2):
             currentRoomsCount += 1
 
     try_add_more_doors(maparr)
+
+    update_doors_key_levels(maparr)
     remove_some_doors(maparr)
 
     place_stairs(maparr)
