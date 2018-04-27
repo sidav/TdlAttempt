@@ -130,7 +130,6 @@ def digRoomWithInnerRoom(maparr, x, y, w, h): # digs a room with a smaller room 
         doorY = y + innerRoomVertOffset + _random(1, innerRoomHeight - 2)
         doorX = x + innerRoomHorizOffset + _random(0, 1)*(innerRoomWidth - 1)
     put_single_tile(maparr, doorX, doorY, _DOOR_CODE)
-    # maparr[doorX][doorY] = Tile(_DOOR_CODE, curr_key_level)
 
 
 def digEllipticRoom(maparr, x, y, w, h, entryX, entryY):
@@ -247,7 +246,7 @@ def digSnakeRoom(maparr, x, y, w, h, entryX, entryY):
 ###########################
 ## THERE ##################
 ###########################
-def pickRoomAnddraw_rect_of_chars(maparr, x, y, w, h, entryX, entryY):  # Subject for changes.
+def choose_shape_and_dig_room(maparr, x, y, w, h, entryX, entryY):  # Subject for changes.
     #roomIsDigged = False
     roomType = _random(0, 3)
     if (w >= 7 and h >= 7):
@@ -267,7 +266,8 @@ def pickRoomAnddraw_rect_of_chars(maparr, x, y, w, h, entryX, entryY):  # Subjec
         else: put_rect_of_tiles(maparr, x, y, w, h)
     print("room digged at ({0};{1}) with w{2}, h{3} entry({4};{5})".format(x, y, w, h, entryX, entryY))
 
-def isWall(maparr, x, y, w=1, h=1):
+
+def is_wall(maparr, x, y, w=1, h=1):
     for i in range (x, x+w):
         for j in range(y, y+h):
             if 0 < i < _MAP_WIDTH-1 and 0 < j < _MAP_HEIGHT-1:
@@ -303,7 +303,7 @@ def tryAddCorridor(maparr):
         currCell = _Vector()
         corrLength = _random(_MIN_CORRIDOR_LENGTH, _MAX_CORRIDOR_LENGTH)
 
-        while not isWall(maparr, currCell.x, currCell.y):
+        while not is_wall(maparr, currCell.x, currCell.y):
             currCell = _Vector()
 
         digDirection = pickDirectionForDigging(maparr, currCell.x, currCell.y)
@@ -314,22 +314,22 @@ def tryAddCorridor(maparr):
 
         # TODO: add dig up/down restrictions (i.e. there should be more "digged horizontally" corridors than "digged vertically" ones)
         if dirx == 1: # dig right
-            if isWall(maparr, currCell.x, currCell.y-1, corrLength, 3):
+            if is_wall(maparr, currCell.x, currCell.y-1, corrLength, 3):
                 put_rect_of_tiles(maparr, currCell.x + 1, currCell.y, corrLength, 1)
                 maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
         elif dirx == -1: # dig left
-            if isWall(maparr, currCell.x-corrLength-1, currCell.y-1, corrLength, 3):
+            if is_wall(maparr, currCell.x-corrLength-1, currCell.y-1, corrLength, 3):
                 put_rect_of_tiles(maparr, currCell.x - corrLength, currCell.y, corrLength, 1)
                 maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
         elif diry == 1: # dig down
-            if isWall(maparr, currCell.x-1, currCell.y, 3, corrLength):
+            if is_wall(maparr, currCell.x-1, currCell.y, 3, corrLength):
                 put_rect_of_tiles(maparr, currCell.x, currCell.y + 1, 1, corrLength)
                 maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
         elif diry == -1: # dig up
-            if isWall(maparr, currCell.x-1, currCell.y-corrLength, 3, corrLength):
+            if is_wall(maparr, currCell.x-1, currCell.y-corrLength, 3, corrLength):
                 put_rect_of_tiles(maparr, currCell.x, currCell.y - corrLength, 1, corrLength)
                 maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
@@ -342,7 +342,7 @@ def tryAddRoom(maparr):
         roomH = _random(_MIN_ROOM_SIZE, _MAX_ROOM_SIZE)
         horOffset = _random(0, roomW-1)
         vertOffset = _random(0, roomH-1)
-        while not isWall(maparr, currCell.x, currCell.y):
+        while not is_wall(maparr, currCell.x, currCell.y):
             currCell = _Vector()
 
         digDirection = pickDirectionForDigging(maparr, currCell.x, currCell.y)
@@ -352,23 +352,23 @@ def tryAddRoom(maparr):
             continue
         #TODO: add dig up/down restrictions (i.e. there should be more "digged horizontally" rooms than "digged vertically" ones)
         if dirx == 1: # dig right
-            if isWall(maparr, currCell.x, currCell.y-vertOffset-1, roomW+2, roomH+2):
-                pickRoomAnddraw_rect_of_chars(maparr, currCell.x+1, currCell.y-vertOffset, roomW, roomH, currCell.x, currCell.y)
+            if is_wall(maparr, currCell.x, currCell.y-vertOffset-1, roomW+2, roomH+2):
+                choose_shape_and_dig_room(maparr, currCell.x + 1, currCell.y - vertOffset, roomW, roomH, currCell.x, currCell.y)
                 maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
         elif dirx == -1: # dig left
-            if isWall(maparr, currCell.x-roomW-1, currCell.y-vertOffset-1, roomW+2, roomH+2):
-                pickRoomAnddraw_rect_of_chars(maparr, currCell.x-roomW, currCell.y-vertOffset, roomW, roomH, currCell.x, currCell.y)
+            if is_wall(maparr, currCell.x-roomW-1, currCell.y-vertOffset-1, roomW+2, roomH+2):
+                choose_shape_and_dig_room(maparr, currCell.x - roomW, currCell.y - vertOffset, roomW, roomH, currCell.x, currCell.y)
                 maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
         elif diry == 1: # dig down
-            if isWall(maparr, currCell.x-horOffset-1, currCell.y, roomW+2, roomH+2):
-                pickRoomAnddraw_rect_of_chars(maparr, currCell.x-horOffset, currCell.y+1, roomW, roomH, currCell.x, currCell.y)
+            if is_wall(maparr, currCell.x-horOffset-1, currCell.y, roomW+2, roomH+2):
+                choose_shape_and_dig_room(maparr, currCell.x - horOffset, currCell.y + 1, roomW, roomH, currCell.x, currCell.y)
                 maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
         elif diry == -1: # dig up
-            if isWall(maparr, currCell.x-horOffset-1, currCell.y-roomH-1, roomW+2, roomH+2):
-                pickRoomAnddraw_rect_of_chars(maparr, currCell.x-horOffset, currCell.y-roomH, roomW, roomH, currCell.x, currCell.y)
+            if is_wall(maparr, currCell.x-horOffset-1, currCell.y-roomH-1, roomW+2, roomH+2):
+                choose_shape_and_dig_room(maparr, currCell.x - horOffset, currCell.y - roomH, roomW, roomH, currCell.x, currCell.y)
                 maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
                 return
 
