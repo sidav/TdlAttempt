@@ -303,7 +303,7 @@ def tryAddCorridor(maparr):
         currCell = _Vector()
         corrLength = _random(_MIN_CORRIDOR_LENGTH, _MAX_CORRIDOR_LENGTH)
 
-        while not is_wall(maparr, currCell.x, currCell.y):
+        while not is_wall(maparr, currCell.x, currCell.y) or count_walls_around(maparr, currCell.x, currCell.y) < 2:
             currCell = _Vector()
 
         digDirection = pickDirectionForDigging(maparr, currCell.x, currCell.y)
@@ -562,4 +562,4 @@ def draw_shit(maparr):
             CW.putChar(tile_char, i, j)
 
     CW.flushConsole()
-    time.sleep(5)
+    time.sleep(0.1)
