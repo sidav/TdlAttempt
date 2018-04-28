@@ -316,22 +316,22 @@ def tryAddCorridor(maparr):
         if dirx == 1: # dig right
             if is_wall(maparr, currCell.x, currCell.y-1, corrLength, 3):
                 put_rect_of_tiles(maparr, currCell.x + 1, currCell.y, corrLength, 1)
-                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
+                put_single_tile(maparr, currCell.x, currCell.y, _DOOR_CODE)
                 return
         elif dirx == -1: # dig left
             if is_wall(maparr, currCell.x-corrLength-1, currCell.y-1, corrLength, 3):
                 put_rect_of_tiles(maparr, currCell.x - corrLength, currCell.y, corrLength, 1)
-                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
+                put_single_tile(maparr, currCell.x, currCell.y, _DOOR_CODE)
                 return
         elif diry == 1: # dig down
             if is_wall(maparr, currCell.x-1, currCell.y, 3, corrLength):
                 put_rect_of_tiles(maparr, currCell.x, currCell.y + 1, 1, corrLength)
-                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
+                put_single_tile(maparr, currCell.x, currCell.y, _DOOR_CODE)
                 return
         elif diry == -1: # dig up
             if is_wall(maparr, currCell.x-1, currCell.y-corrLength, 3, corrLength):
                 put_rect_of_tiles(maparr, currCell.x, currCell.y - corrLength, 1, corrLength)
-                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
+                put_single_tile(maparr, currCell.x, currCell.y, _DOOR_CODE)
                 return
 
 
@@ -354,22 +354,22 @@ def tryAddRoom(maparr):
         if dirx == 1: # dig right
             if is_wall(maparr, currCell.x, currCell.y-vertOffset-1, roomW+2, roomH+2):
                 choose_shape_and_dig_room(maparr, currCell.x + 1, currCell.y - vertOffset, roomW, roomH, currCell.x, currCell.y)
-                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
+                put_single_tile(maparr, currCell.x, currCell.y, _DOOR_CODE)
                 return
         elif dirx == -1: # dig left
             if is_wall(maparr, currCell.x-roomW-1, currCell.y-vertOffset-1, roomW+2, roomH+2):
                 choose_shape_and_dig_room(maparr, currCell.x - roomW, currCell.y - vertOffset, roomW, roomH, currCell.x, currCell.y)
-                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
+                put_single_tile(maparr, currCell.x, currCell.y, _DOOR_CODE)
                 return
         elif diry == 1: # dig down
             if is_wall(maparr, currCell.x-horOffset-1, currCell.y, roomW+2, roomH+2):
                 choose_shape_and_dig_room(maparr, currCell.x - horOffset, currCell.y + 1, roomW, roomH, currCell.x, currCell.y)
-                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
+                put_single_tile(maparr, currCell.x, currCell.y, _DOOR_CODE)
                 return
         elif diry == -1: # dig up
             if is_wall(maparr, currCell.x-horOffset-1, currCell.y-roomH-1, roomW+2, roomH+2):
                 choose_shape_and_dig_room(maparr, currCell.x - horOffset, currCell.y - roomH, roomW, roomH, currCell.x, currCell.y)
-                maparr[currCell.x][currCell.y] = Tile(_DOOR_CODE, curr_key_level)
+                put_single_tile(maparr, currCell.x, currCell.y, _DOOR_CODE)
                 return
 
 # def findWallForDoor(maparr):
@@ -474,7 +474,10 @@ def update_doors_key_levels(maparr): # shitty workaround
     for x in range(len(maparr)):
         for y in range(len(maparr[0])):
             if maparr[x][y].char == _DOOR_CODE:
-                maparr[x][y].key_level = get_highest_key_level_around(maparr, x, y)
+                if is_neighbouring_with_different_key_levels(maparr, x, y):
+                    maparr[x][y].key_level = get_highest_key_level_around(maparr, x, y)
+                else:
+                    maparr[x][y].key_level = 0
 
 
 def generateDungeon(mapw, maph, max_key_levels=2):
