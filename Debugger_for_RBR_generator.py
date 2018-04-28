@@ -33,8 +33,9 @@ key_levels = {
 }
 
 def debug_RBR():
+    RBRDungeonGenerator.setRandomSeed(int(time.time()))
     while not CW.isWindowClosed():
-        RBRDungeonGenerator.setRandomSeed(int(time.time()))
+        key_pressed_text = ''
         map = RBRDungeonGenerator.generateDungeon(SCREEN_WIDTH, SCREEN_HEIGHT)
 
         for i in range(SCREEN_WIDTH):
@@ -45,5 +46,6 @@ def debug_RBR():
                 CW.putChar(tile_char, i, j)
 
         CW.flushConsole()
-        CW.readKey()
+        while key_pressed_text != 'SPACE':
+            key_pressed_text = CW.readKey().keychar
 
