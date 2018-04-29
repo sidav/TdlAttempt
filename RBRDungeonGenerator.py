@@ -545,7 +545,7 @@ def polish_deadend_corridors(maparr):
         for y in range(len(maparr[0])):
             if maparr[x][y].char == _FLOOR_CODE and count_adjacent_walls(maparr, x, y) == 3:
                 if _random(0, 10) < 3:
-                    put_single_tile(maparr, x, y, _DEBUG_TILE_CODE)
+                    put_single_tile(maparr, x, y, _WALL_CODE)
                     print('PURGED {};{}'.format(x, y))
 
 
