@@ -8,15 +8,14 @@ _FLOOR_CODE = '.'
 _CLDOOR_CODE = '+'
 _OPDOOR_CODE = '\\'
 
-
 tile_names = {
     'wall': _WALL_CODE,
     'floor': _FLOOR_CODE,
     'door': _CLDOOR_CODE,
-    'ustairs' : '>',
-    'dstairs': '<'
+    'ustairs': '>',
+    'dstairs': '<',
+    'debugtile': '#'
 }
-
 
 tile_colors = {
     _WALL_CODE: (128, 128, 128),
@@ -44,6 +43,8 @@ def debug_RBR():
                 #CW.setForegroundColor(tile_colors[tile_char])
                 CW.setForegroundColor(key_levels[map[i][j].key_level])
                 CW.putChar(tile_char, i, j)
+                if map[i][j].char == 'debugtile':
+                    CW.setForegroundColor(255, 0, 255)
 
         CW.flushConsole()
         while key_pressed_text != 'SPACE':

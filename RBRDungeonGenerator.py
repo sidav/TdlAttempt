@@ -43,6 +43,8 @@ _KEY_KEEPER_CODE = 'kkeeper'
 _DOWN_STAIRS_CODE = 'dstairs'
 _UP_STAIRS_CODE = 'ustairs'
 
+_DEBUG_TILE_CODE = 'debugtile'
+
 curr_key_level = 0
 max_key_level = 2
 
@@ -88,7 +90,7 @@ def put_rect_of_tiles(maparr, x, y, w, h, char=_FLOOR_CODE, key_level=-1):  # fi
 def digEntryCorridor(maparr, x, y, w, h, entryX, entryY, length=0): #needed for irregular shaped rooms
     if y <= entryY <= y + h:
         if length == 0:
-            length = int(w / 2)
+            length = int(w / 1.5)
         if entryX < x:
             put_rect_of_tiles(maparr, entryX, entryY, length, 1)
         else:
@@ -327,6 +329,10 @@ def tryAddCorridor(maparr):
             end_point_x, end_point_y = currCell.x + corrLength, currCell.y
             horiz = True
             door_x, door_y = start_point_x, start_point_y
+            if count_adjacent_walls(maparr, end_point_x, end_point_y) == 1 or \
+                    count_adjacent_walls(maparr, end_point_x, end_point_y) == 4 and \
+                    count_diag_walls(maparr, end_point_x, end_point_y) != 4:
+                continue
 
         elif dirx == -1: # dig left
             print('CORR LEFT')
@@ -334,6 +340,10 @@ def tryAddCorridor(maparr):
             end_point_x, end_point_y = currCell.x, currCell.y
             horiz = True
             door_x, door_y = end_point_x, end_point_y
+            if count_adjacent_walls(maparr, start_point_x, start_point_y) == 1 or \
+                    count_adjacent_walls(maparr, start_point_x, start_point_y) == 4 and \
+                    count_diag_walls(maparr, start_point_x, start_point_y) != 4:
+                continue
 
         elif diry == 1: # dig down
             print('CORR DOWN')
@@ -341,6 +351,10 @@ def tryAddCorridor(maparr):
             end_point_x, end_point_y = currCell.x, currCell.y + corrLength
             horiz = False
             door_x, door_y = start_point_x, start_point_y
+            if count_adjacent_walls(maparr, end_point_x, end_point_y) == 1 or \
+                    count_adjacent_walls(maparr, end_point_x, end_point_y) == 4 and \
+                    count_diag_walls(maparr, end_point_x, end_point_y) != 4:
+                continue
 
         elif diry == -1: # dig up
             print('CORR UP')
@@ -348,6 +362,10 @@ def tryAddCorridor(maparr):
             end_point_x, end_point_y = currCell.x, currCell.y
             horiz = False
             door_x, door_y = end_point_x, end_point_y
+            if count_adjacent_walls(maparr, start_point_x, start_point_y) == 1 or \
+                    count_adjacent_walls(maparr, start_point_x, start_point_y) == 4 and \
+                    count_diag_walls(maparr, start_point_x, start_point_y) != 4:
+                continue
 
         if horiz:
             if not is_wall(maparr, start_point_x, start_point_y-1, corrLength, 3):
@@ -366,46 +384,6 @@ def tryAddCorridor(maparr):
         # else:
         put_single_tile(maparr, door_x, door_y, _DOOR_CODE, key_level)
         return
-
-        # if dirx == 1: # dig right
-        #     if is_wall(maparr, currCell.x, currCell.y-1, corrLength, 3):
-        #         key_level_start = get_highest_key_level_around(maparr, currCell.x, currCell.y)
-        #         key_level_end = get_highest_key_level_around(maparr, currCell.x + corrLength + 1, currCell.y)
-        #         key_level = max(key_level_start, key_level_end)
-        #
-        #         put_rect_of_tiles(maparr, currCell.x + 1, currCell.y, corrLength, 1, _FLOOR_CODE, key_level)
-        #         put_single_tile(maparr, currCell.x, currCell.y, _DOOR_CODE, key_level)
-        #         return
-        #
-        # elif dirx == -1: # dig left
-        #     if is_wall(maparr, currCell.x-corrLength-1, currCell.y-1, corrLength, 3):
-        #         key_level_start = get_highest_key_level_around(maparr, currCell.x - corrLength, currCell.y)
-        #         key_level_end = get_highest_key_level_around(maparr, currCell.x, currCell.y)
-        #         key_level = max(key_level_start, key_level_end)
-        #
-        #         put_rect_of_tiles(maparr, currCell.x - corrLength, currCell.y, corrLength, 1, _FLOOR_CODE, key_level)
-        #         put_single_tile(maparr, currCell.x, currCell.y, _DOOR_CODE, key_level)
-        #         return
-        #
-        # elif diry == 1: # dig down
-        #     if is_wall(maparr, currCell.x-1, currCell.y, 3, corrLength):
-        #         key_level_start = get_highest_key_level_around(maparr, currCell.x, currCell.y+1)
-        #         key_level_end = get_highest_key_level_around(maparr, currCell.x, currCell.y + corrLength + 1)
-        #         key_level = max(key_level_start, key_level_end)
-        #
-        #         put_rect_of_tiles(maparr, currCell.x, currCell.y + 1, 1, corrLength, _FLOOR_CODE, key_level)
-        #         put_single_tile(maparr, currCell.x, currCell.y, _DOOR_CODE, key_level)
-        #         return
-        #
-        # elif diry == -1: # dig up
-        #     if is_wall(maparr, currCell.x-1, currCell.y-corrLength, 3, corrLength):
-        #         key_level_start = get_highest_key_level_around(maparr, currCell.x, currCell.y - corrLength)
-        #         key_level_end = get_highest_key_level_around(maparr, currCell.x, currCell.y)
-        #         key_level = max(key_level_start, key_level_end)
-        #
-        #         put_rect_of_tiles(maparr, currCell.x, currCell.y - corrLength, 1, corrLength,  _FLOOR_CODE, key_level)
-        #         put_single_tile(maparr, currCell.x, currCell.y, _DOOR_CODE, key_level)
-        #         return
 
 
 def tryAddRoom(maparr):
@@ -445,17 +423,6 @@ def tryAddRoom(maparr):
                 put_single_tile(maparr, currCell.x, currCell.y, _DOOR_CODE)
                 return
 
-# def findWallForDoor(maparr):
-#     for _ in range(1000):
-#         # first, take a look at a random cell
-#         x = _random(0, _MAP_WIDTH)
-#         y = _random(0, _MAP_HEIGHT)
-#         # check if it's a wall
-#         if maparr[x][y] != _WALL_CODE:
-#             continue
-#         # let's check if it is "thick" wall
-#         if () or ():
-
 
 def count_walls_around(maparr, x, y):
     walls = 0
@@ -465,6 +432,27 @@ def count_walls_around(maparr, x, y):
                 walls += 1
     return walls
 
+
+def count_adjacent_walls(maparr, x, y):
+    walls = 0
+    for i in [x-1, x+1]:
+        if 0 <= i < _MAP_WIDTH and  0 <= y < _MAP_HEIGHT:
+            if maparr[i][y].char == _WALL_CODE:
+                walls += 1
+    for i in [y-1, y+1]:
+        if 0 <= x < _MAP_WIDTH and 0 <= i < _MAP_HEIGHT:
+            if maparr[x][i].char == _WALL_CODE:
+                walls += 1
+    return walls
+
+def count_diag_walls(maparr, x, y):
+    walls = 0
+    for i in [x-1, x+1]:
+        for j in [y-1, y+1]:
+            if 0 <= i < _MAP_WIDTH and 0 <= j < _MAP_HEIGHT:
+                if maparr[i][j].char == _WALL_CODE:
+                    walls += 1
+    return walls
 
 def get_highest_key_level_around(maparr, x, y):
     lvl = 0
@@ -481,9 +469,7 @@ def is_neighbouring_with_different_key_levels(maparr, x, y):
     for i in [x-1, x, x+1]:
         for j in [y-1, y, y+1]:
             if maparr[i][j].key_level != lvl and maparr[i][j].char != _WALL_CODE:  # Walls doesn't count
-                print("{}, {} IS neighbouring!".format(i, j))
                 return True
-        print("{}, {} IS NOT neighbouring!".format(i, j))
     return False
 
 
@@ -537,7 +523,7 @@ def place_stairs(maparr):
     put_single_tile(maparr, x, y, _DOWN_STAIRS_CODE, 0)
     print('{},{} DSTAIRS'.format(x, y))
 
-    while (maparr[x][y].char != _FLOOR_CODE or maparr[x][y].key_level != 2 or count_walls_around(maparr, x, y) > 3):  # TODO: replace .key_level != 2 with not shit
+    while (maparr[x][y].char != _FLOOR_CODE or maparr[x][y].key_level != max_key_level or count_walls_around(maparr, x, y) > 3):
         x = _random(2, _MAP_WIDTH - 2)
         y = _random(2, _MAP_HEIGHT - 2)
     put_single_tile(maparr, x, y, _UP_STAIRS_CODE, 2)
@@ -552,6 +538,15 @@ def update_doors_key_levels(maparr): # shitty workaround
                     maparr[x][y].key_level = get_highest_key_level_around(maparr, x, y)
                 else:
                     maparr[x][y].key_level = 0
+
+
+def polish_deadend_corridors(maparr):
+    for x in range(len(maparr)):
+        for y in range(len(maparr[0])):
+            if maparr[x][y].char == _FLOOR_CODE and count_adjacent_walls(maparr, x, y) == 3:
+                if _random(0, 10) < 3:
+                    put_single_tile(maparr, x, y, _DEBUG_TILE_CODE)
+                    print('PURGED {};{}'.format(x, y))
 
 
 def generateDungeon(mapw, maph, max_key_levels=2):
@@ -595,8 +590,12 @@ def generateDungeon(mapw, maph, max_key_levels=2):
     place_stairs(maparr)
 
     makeOutline(maparr, 0, 0, _MAP_WIDTH, _MAP_HEIGHT, _WALL_CODE)
+
+    polish_deadend_corridors(maparr)
+
     return maparr
 
+##################################################################################################
 # DELETE EVERYTHING BELOW:
 
 def draw_shit(maparr):
@@ -614,7 +613,8 @@ def draw_shit(maparr):
         'floor': _FLOOR_CODE,
         'door': _CLDOOR_CODE,
         'ustairs' : '>',
-        'dstairs': '<'
+        'dstairs': '<',
+        'debugtile': '#'
     }
 
 
@@ -637,6 +637,8 @@ def draw_shit(maparr):
             tile_char = tile_names[maparr[i][j].char]
             # CW.setForegroundColor(tile_colors[tile_char])
             CW.setForegroundColor(key_levels[maparr[i][j].key_level])
+            if maparr[i][j].char == 'debugtile':
+                CW.setForegroundColor(255, 0, 255)
             CW.putChar(tile_char, i, j)
 
     CW.flushConsole()
