@@ -26,12 +26,12 @@ def _rand(mod):                                                             #
 _MAP_WIDTH = 80
 _MAP_HEIGHT = 25
 
-_MAX_PLACEMENT_TRIES = 1000
+_MAX_PLACEMENT_TRIES = 250 # 1000
 
-_MAX_CORRIDORS_COUNT = 60
-_MAX_ROOMS_COUNT = 35
+_MAX_CORRIDORS_COUNT = 50
+_MAX_ROOMS_COUNT = 50
 
-_MIN_ROOM_SIZE = 3
+_MIN_ROOM_SIZE = 2
 _MAX_ROOM_SIZE = 15
 _MIN_CORRIDOR_LENGTH = 2
 _MAX_CORRIDOR_LENGTH = 10
@@ -267,6 +267,8 @@ def choose_shape_and_dig_room(maparr, x, y, w, h, entryX, entryY):  # Subject fo
             digCircularOutlinedRoom(maparr, x, y, w, h, entryX, entryY)
         elif roomType == 3:
             digRoomWithCross(maparr, x, y, w, h)
+    elif w == 2 or h == 2:
+        put_rect_of_tiles(maparr, x, y, w, h)
     else:
         if roomType == 1:
             digLongRoom(maparr, x, y, w, h)
@@ -305,9 +307,27 @@ def pickDirectionForDigging(maparr, x, y):
     return direction
 
 
+def corridor_endpoint_is_bad(maparr, x, y, offset_x, offset_y):  # used only in the try_add_corridor() routine
+    RANDOM_SIFTING_THRESHOLD = 99
+    if is_wall(maparr, x + offset_x, y+offset_y, 1, 1):
+        if _random(0, 100) < RANDOM_SIFTING_THRESHOLD:
+            print('Corridor rejected')
+            return True
+        else:
+            print('corridor ending is bad, placing anyway...')
+    if count_adjacent_walls(maparr, x, y) == 1 or \
+            count_adjacent_walls(maparr, x, y) == 4 and \
+            count_diag_walls(maparr, x, y) != 4:
+        return True
+    return False
+
+
+def corridor_startpoint_is_bad(maparr, x, y):  # used only in the try_add_corridor() routine
+    if count_adjacent_walls(maparr, x, y) == 1:
+        return True
+
+
 def tryAddCorridor(maparr):
-    #TODO: Maybe ALLOW corridors to lead into existing rooms?
-    #TODO: i.e. disable the "corridor ending tile emptiness check"?
     for tries in range (_MAX_PLACEMENT_TRIES):
         currCell = _Vector()
         corrLength = _random(_MIN_CORRIDOR_LENGTH, _MAX_CORRIDOR_LENGTH)
@@ -329,9 +349,7 @@ def tryAddCorridor(maparr):
             end_point_x, end_point_y = currCell.x + corrLength, currCell.y
             horiz = True
             door_x, door_y = start_point_x, start_point_y
-            if count_adjacent_walls(maparr, end_point_x, end_point_y) == 1 or \
-                    count_adjacent_walls(maparr, end_point_x, end_point_y) == 4 and \
-                    count_diag_walls(maparr, end_point_x, end_point_y) != 4:
+            if corridor_startpoint_is_bad(maparr, start_point_x, start_point_y) or corridor_endpoint_is_bad(maparr, end_point_x, end_point_y, 1, 0):
                 continue
 
         elif dirx == -1: # dig left
@@ -340,9 +358,7 @@ def tryAddCorridor(maparr):
             end_point_x, end_point_y = currCell.x, currCell.y
             horiz = True
             door_x, door_y = end_point_x, end_point_y
-            if count_adjacent_walls(maparr, start_point_x, start_point_y) == 1 or \
-                    count_adjacent_walls(maparr, start_point_x, start_point_y) == 4 and \
-                    count_diag_walls(maparr, start_point_x, start_point_y) != 4:
+            if corridor_startpoint_is_bad(maparr, end_point_x, end_point_y) or corridor_endpoint_is_bad(maparr, start_point_x, start_point_y, -1, 0):
                 continue
 
         elif diry == 1: # dig down
@@ -351,9 +367,7 @@ def tryAddCorridor(maparr):
             end_point_x, end_point_y = currCell.x, currCell.y + corrLength
             horiz = False
             door_x, door_y = start_point_x, start_point_y
-            if count_adjacent_walls(maparr, end_point_x, end_point_y) == 1 or \
-                    count_adjacent_walls(maparr, end_point_x, end_point_y) == 4 and \
-                    count_diag_walls(maparr, end_point_x, end_point_y) != 4:
+            if corridor_startpoint_is_bad(maparr, start_point_x, start_point_y) or corridor_endpoint_is_bad(maparr, end_point_x, end_point_y, 0, 1):
                 continue
 
         elif diry == -1: # dig up
@@ -362,9 +376,7 @@ def tryAddCorridor(maparr):
             end_point_x, end_point_y = currCell.x, currCell.y
             horiz = False
             door_x, door_y = end_point_x, end_point_y
-            if count_adjacent_walls(maparr, start_point_x, start_point_y) == 1 or \
-                    count_adjacent_walls(maparr, start_point_x, start_point_y) == 4 and \
-                    count_diag_walls(maparr, start_point_x, start_point_y) != 4:
+            if corridor_startpoint_is_bad(maparr, end_point_x, end_point_y) or corridor_endpoint_is_bad(maparr, start_point_x, start_point_y, 0, -1):
                 continue
 
         if horiz:
@@ -384,6 +396,7 @@ def tryAddCorridor(maparr):
         # else:
         put_single_tile(maparr, door_x, door_y, _DOOR_CODE, key_level)
         return
+    print('Corridor placement failed: used all the tries.')
 
 
 def tryAddRoom(maparr):
@@ -554,16 +567,20 @@ def generateDungeon(mapw, maph, max_key_levels=2):
     _MAP_WIDTH = mapw
     _MAP_HEIGHT = maph
     max_key_level = max_key_levels
+
     # Fill the map with solid walls.
     maparr = [[Tile(_WALL_CODE)] * (_MAP_HEIGHT + 1) for _ in range(_MAP_WIDTH + 1)]
     # reset key level
     curr_key_level = 0
     # Place the random room in center of the map.
     placeInitialRoom(maparr)
-    #TODO: all the other shit
+
     currentRoomsCount = 1
     currentCorrsCount = 0
-    while currentRoomsCount < _MAX_ROOMS_COUNT or currentCorrsCount < _MAX_CORRIDORS_COUNT:
+    total_count = 0
+
+    while currentRoomsCount < _MAX_ROOMS_COUNT or currentCorrsCount < _MAX_CORRIDORS_COUNT \
+            or total_count < _MAX_ROOMS_COUNT + _MAX_CORRIDORS_COUNT:
 
         curr_key_level = int((currentRoomsCount / _MAX_ROOMS_COUNT * 10))
         if 0 <= curr_key_level <= 1:
@@ -580,7 +597,9 @@ def generateDungeon(mapw, maph, max_key_levels=2):
             tryAddRoom(maparr)
             currentRoomsCount += 1
 
-        draw_shit(maparr) # <----- DELETE IT
+        total_count += 1
+
+        draw_shit(maparr)  # <----- DELETE IT
 
     try_add_more_doors(maparr)
 
@@ -642,4 +661,4 @@ def draw_shit(maparr):
             CW.putChar(tile_char, i, j)
 
     CW.flushConsole()
-    time.sleep(0.01)
+    time.sleep(0.1)
