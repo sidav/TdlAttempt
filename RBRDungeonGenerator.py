@@ -26,7 +26,8 @@ def _rand(mod):                                                             #
 _MAP_WIDTH = 80
 _MAP_HEIGHT = 25
 
-_MAX_PLACEMENT_TRIES = 250 # 1000
+_MAX_ROOM_PLACEMENT_TRIES = 1000
+_MAX_CORRIDOR_PLACEMENT_TRIES = 250
 
 _MAX_CORRIDORS_COUNT = 50
 _MAX_ROOMS_COUNT = 50
@@ -344,7 +345,7 @@ def corridor_startpoint_is_bad(x, y):  # used only in the try_add_corridor() rou
 
 def tryAddCorridor():
     global current_map
-    for tries in range (_MAX_PLACEMENT_TRIES):
+    for tries in range (_MAX_CORRIDOR_PLACEMENT_TRIES):
         currCell = _Vector()
         corrLength = _random(_MIN_CORRIDOR_LENGTH, _MAX_CORRIDOR_LENGTH)
 
@@ -417,7 +418,7 @@ def tryAddCorridor():
 
 def tryAddRoom():
     global current_map
-    for tries in range (_MAX_PLACEMENT_TRIES):
+    for tries in range (_MAX_ROOM_PLACEMENT_TRIES):
         currCell = _Vector()
         roomW = _random(_MIN_ROOM_SIZE, _MAX_ROOM_SIZE)
         roomH = _random(_MIN_ROOM_SIZE, _MAX_ROOM_SIZE)
@@ -533,7 +534,7 @@ def try_add_more_doors():
                         current_map[x-1][y] = Tile(_DOOR_CODE, get_highest_key_level_around(x-1, y))
 
 
-def remove_some_doors():
+def remove_some_random_doors():
     global current_map
     for x in range (_MAP_WIDTH):
         for y in range(_MAP_HEIGHT):
@@ -569,7 +570,7 @@ def place_stairs():
     print('{},{} USTAIRS'.format(x, y))
 
 
-def update_doors_key_levels(): # shitty workaround
+def update_doors_key_levels():  # shitty workaround
     global current_map
     for x in range(len(current_map)):
         for y in range(len(current_map[0])):
@@ -581,15 +582,41 @@ def update_doors_key_levels(): # shitty workaround
 
 
 def polish_deadend_corridors():
-    global current_map
-    for x in range(len(current_map)):
-        for y in range(len(current_map[0])):
-            if current_map[x][y].char == _FLOOR_CODE and count_adjacent_walls(x, y) == 3:
-                if _random(0, 10) < 3:
+    def maybe_purge(x, y): #  yep, this is a def inside of a def. WHAT A SHITTY-WITTY CODE, OH MY!
+        if current_map[x][y].char == _FLOOR_CODE and count_adjacent_walls(x, y) == 3:
+            if count_diag_walls(x, y) == 4:
+                if _random(0, 10) < 5:
                     put_single_tile(x, y, _WALL_CODE)
-                    print('PURGED {};{}'.format(x, y))
+            elif _random(0, 10) < 1:
+                put_single_tile(x, y, _WALL_CODE)
+
+    global current_map
+    for x in range(0, _MAP_WIDTH):
+        for y in range(0, _MAP_HEIGHT):
+            maybe_purge(x, y)
+    for x in range(_MAP_WIDTH, 0, -1):
+        for y in range(0, _MAP_HEIGHT):
+            maybe_purge(x, y)
+    for x in range(0, _MAP_WIDTH):
+        for y in range(_MAP_HEIGHT, 0, -1):
+            maybe_purge(x, y)
+    for x in range(_MAP_WIDTH, 0, -1):
+        for y in range(_MAP_HEIGHT, 0, -1):
+            maybe_purge(x, y)
 
 
+def purge_bad_doors():
+    global current_map
+    for x in range(0, _MAP_WIDTH):
+        for y in range(0, _MAP_HEIGHT):
+            if current_map[x][y].char == _DOOR_CODE:
+                adj_walls = count_adjacent_walls(x, y)
+                if adj_walls != 2:
+                    put_single_tile(x, y, _FLOOR_CODE)
+
+
+
+### MAIN ROUTINE: ###
 def generateDungeon(mapw, maph, max_key_levels=2):
     global _MAP_WIDTH, _MAP_HEIGHT, curr_key_level, max_key_level, current_map
     _MAP_WIDTH = mapw
@@ -607,9 +634,7 @@ def generateDungeon(mapw, maph, max_key_levels=2):
     currentCorrsCount = 0
     total_count = 0
 
-    while currentRoomsCount < _MAX_ROOMS_COUNT or currentCorrsCount < _MAX_CORRIDORS_COUNT \
-            or total_count < _MAX_ROOMS_COUNT + _MAX_CORRIDORS_COUNT:
-
+    while currentRoomsCount < _MAX_ROOMS_COUNT or currentCorrsCount < _MAX_CORRIDORS_COUNT:
         curr_key_level = int((currentRoomsCount / _MAX_ROOMS_COUNT * 10))
         if 0 <= curr_key_level <= 1:
             curr_key_level = 0
@@ -632,13 +657,15 @@ def generateDungeon(mapw, maph, max_key_levels=2):
     try_add_more_doors()
 
     update_doors_key_levels()
-    remove_some_doors()
+    remove_some_random_doors()
 
     place_stairs()
 
     makeOutline(0, 0, _MAP_WIDTH, _MAP_HEIGHT, _WALL_CODE)
 
+    # Time for shitty workarounds:
     polish_deadend_corridors()
+    purge_bad_doors()
 
     return current_map
 
