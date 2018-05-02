@@ -39,11 +39,11 @@ def debug_RBR():
 
         for i in range(SCREEN_WIDTH):
             for j in range(SCREEN_HEIGHT):
-                tile_char = tile_names[map[i][j].char]
+                tile_char = tile_names[map[i][j].tile_code]
                 #CW.setForegroundColor(tile_colors[tile_char])
                 CW.setForegroundColor(key_levels[map[i][j].key_level])
                 CW.putChar(tile_char, i, j)
-                if map[i][j].char == 'debugtile':
+                if map[i][j].tile_code == 'debugtile':
                     CW.setForegroundColor(255, 0, 255)
 
         CW.flushConsole()

@@ -1,4 +1,4 @@
-# Room-By-Room dungeon generator.
+# Room-By-Room dungeon generator v0.3
 # Was already implemented in C# for my "StealthRoguelike" prototype.
 
 #############################################################################
@@ -27,7 +27,7 @@ _MAP_WIDTH = 80
 _MAP_HEIGHT = 25
 
 _MAX_ROOM_PLACEMENT_TRIES = 1000
-_MAX_CORRIDOR_PLACEMENT_TRIES = 250
+_MAX_CORRIDOR_PLACEMENT_TRIES = 500
 
 _MAX_CORRIDORS_COUNT = 50
 _MAX_ROOMS_COUNT = 50
@@ -35,7 +35,7 @@ _MAX_ROOMS_COUNT = 50
 _MIN_ROOM_SIZE = 2
 _MAX_ROOM_SIZE = 15
 _MIN_CORRIDOR_LENGTH = 2
-_MAX_CORRIDOR_LENGTH = 10
+_MAX_CORRIDOR_LENGTH = 15
 
 _FLOOR_CODE = 'floor'
 _WALL_CODE = 'wall'
@@ -53,11 +53,11 @@ current_map = []
 
 
 class Tile:
-    char = 'wall'
+    tile_code = 'wall'
     key_level = 0
     
     def __init__(self, char, key_level=curr_key_level):
-        self.char = char
+        self.tile_code = char
         self.key_level = key_level
 
 
@@ -161,7 +161,6 @@ def digEllipticRoom(x, y, w, h, entryX, entryY):
     if h % 2 == 0:
         roomYRadius -= 1
     entryCorrLength = (w if w > h else h)
-    print("{0}, {1}".format(roomXRadius, roomYRadius))
     roomCenterX = x + roomXRadius
     roomCenterY = y + roomYRadius
     for i in range (x, x+w):
@@ -192,7 +191,6 @@ def digCircularOutlinedRoom(x, y, w, h, entryX, entryY): # Square room with wall
     roomRadius = int(w/2) - 1 # behaviour for the even w/h values may be weird.
     roomCenterX = x+roomRadius+1
     roomCenterY = y+roomRadius+1
-    print("rad {0} cx {1} cy {2}".format(roomRadius, roomCenterX, roomCenterY))
     for i in range (x, x+w):
         for j in range (y, y+h):
             currRelativeCoordX = i - roomCenterX
@@ -289,7 +287,6 @@ def choose_shape_and_dig_room(x, y, w, h, entryX, entryY):  # Subject for change
         elif roomType == 2:
             digSnakeRoom(x, y, w, h, entryX, entryY)
         else: put_rect_of_tiles(x, y, w, h)
-    print("room digged at ({0};{1}) with w{2}, h{3} entry({4};{5})".format(x, y, w, h, entryX, entryY))
 
 
 def is_wall(x, y, w=1, h=1):
@@ -297,7 +294,7 @@ def is_wall(x, y, w=1, h=1):
     for i in range (x, x+w):
         for j in range(y, y+h):
             if 0 < i < _MAP_WIDTH-1 and 0 < j < _MAP_HEIGHT-1:
-                if current_map[i][j].char != _WALL_CODE:
+                if current_map[i][j].tile_code != _WALL_CODE:
                     return False
             else:
                 return  False
@@ -310,13 +307,13 @@ def pickDirectionForDigging(x, y):
     if x >= _MAP_WIDTH or y >= _MAP_HEIGHT:
         print("!!!Oh noes! Coordinates cheburachnulis at ${0}, ${1}!!!".format(x, y))
         #return _Vector(0, 0)
-    if current_map[x][y+1].char == _FLOOR_CODE:
+    if current_map[x][y+1].tile_code == _FLOOR_CODE:
         direction = _Vector(0, -1)
-    elif current_map[x-1][y].char == _FLOOR_CODE:
+    elif current_map[x-1][y].tile_code == _FLOOR_CODE:
         direction = _Vector(1, 0)
-    elif current_map[x][y-1].char == _FLOOR_CODE:
+    elif current_map[x][y-1].tile_code == _FLOOR_CODE:
         direction = _Vector(0, 1)
-    elif current_map[x+1][y].char == _FLOOR_CODE:
+    elif current_map[x+1][y].tile_code == _FLOOR_CODE:
         direction = _Vector(-1, 0)
     else:
         direction = _Vector(0, 0)
@@ -327,10 +324,7 @@ def corridor_endpoint_is_bad(x, y, offset_x, offset_y):  # used only in the try_
     RANDOM_SIFTING_THRESHOLD = 99
     if is_wall(x + offset_x, y+offset_y, 1, 1):
         if _random(0, 100) < RANDOM_SIFTING_THRESHOLD:
-            print('Corridor rejected')
             return True
-        else:
-            print('corridor ending is bad, placing anyway...')
     if count_adjacent_walls(x, y) == 1 or \
             count_adjacent_walls(x, y) == 4 and \
             count_diag_walls(x, y) != 4:
@@ -361,7 +355,6 @@ def tryAddCorridor():
         # TODO: add dig up/down restrictions (i.e. there should be more "digged horizontally" corridors than "digged vertically" ones)
 
         if dirx == 1: # dig right
-            print('CORR RIGHT')
             start_point_x, start_point_y = currCell.x, currCell.y
             end_point_x, end_point_y = currCell.x + corrLength, currCell.y
             horiz = True
@@ -370,7 +363,6 @@ def tryAddCorridor():
                 continue
 
         elif dirx == -1: # dig left
-            print('CORR LEFT')
             start_point_x, start_point_y = currCell.x - corrLength, currCell.y
             end_point_x, end_point_y = currCell.x, currCell.y
             horiz = True
@@ -379,7 +371,6 @@ def tryAddCorridor():
                 continue
 
         elif diry == 1: # dig down
-            print('CORR DOWN')
             start_point_x, start_point_y = currCell.x, currCell.y
             end_point_x, end_point_y = currCell.x, currCell.y + corrLength
             horiz = False
@@ -388,7 +379,6 @@ def tryAddCorridor():
                 continue
 
         elif diry == -1: # dig up
-            print('CORR UP')
             start_point_x, start_point_y = currCell.x, currCell.y - corrLength
             end_point_x, end_point_y = currCell.x, currCell.y
             horiz = False
@@ -413,7 +403,6 @@ def tryAddCorridor():
         # else:
         put_single_tile(door_x, door_y, _DOOR_CODE, key_level)
         return
-    print('Corridor placement failed: used all the tries.')
 
 
 def tryAddRoom():
@@ -460,7 +449,7 @@ def count_walls_around(x, y):
     walls = 0
     for i in [x-1, x, x+1]:
         for j in [y-1, y, y+1]:
-            if current_map[i][j].char == _WALL_CODE:
+            if current_map[i][j].tile_code == _WALL_CODE:
                 walls += 1
     return walls
 
@@ -470,11 +459,11 @@ def count_adjacent_walls(x, y):
     walls = 0
     for i in [x-1, x+1]:
         if 0 <= i < _MAP_WIDTH and  0 <= y < _MAP_HEIGHT:
-            if current_map[i][y].char == _WALL_CODE:
+            if current_map[i][y].tile_code == _WALL_CODE:
                 walls += 1
     for i in [y-1, y+1]:
         if 0 <= x < _MAP_WIDTH and 0 <= i < _MAP_HEIGHT:
-            if current_map[x][i].char == _WALL_CODE:
+            if current_map[x][i].tile_code == _WALL_CODE:
                 walls += 1
     return walls
 
@@ -484,7 +473,7 @@ def count_diag_walls(x, y):
     for i in [x-1, x+1]:
         for j in [y-1, y+1]:
             if 0 <= i < _MAP_WIDTH and 0 <= j < _MAP_HEIGHT:
-                if current_map[i][j].char == _WALL_CODE:
+                if current_map[i][j].tile_code == _WALL_CODE:
                     walls += 1
     return walls
 
@@ -504,7 +493,7 @@ def is_neighbouring_with_different_key_levels(x, y):
     lvl = current_map[x-1][y-1].key_level
     for i in [x-1, x, x+1]:
         for j in [y-1, y, y+1]:
-            if current_map[i][j].key_level != lvl and current_map[i][j].char != _WALL_CODE:  # Walls doesn't count
+            if current_map[i][j].key_level != lvl and current_map[i][j].tile_code != _WALL_CODE:  # Walls doesn't count
                 return True
     return False
 
@@ -513,7 +502,7 @@ def try_add_more_doors():
     global current_map
     for x in range (2, _MAP_WIDTH - 2):
         for y in range(2, _MAP_HEIGHT - 2):
-            if current_map[x][y].char == _FLOOR_CODE:
+            if current_map[x][y].tile_code == _FLOOR_CODE:
                 curr_walls = count_walls_around(x, y)
                 if curr_walls == 6:
                     chance = 15
@@ -521,16 +510,16 @@ def try_add_more_doors():
                     chance = 95
                 if curr_walls >= 6:
                     # try up
-                    if current_map[x][y-2].char == _FLOOR_CODE and current_map[x][y-1].char == _WALL_CODE and _rand(100) < chance:
+                    if current_map[x][y-2].tile_code == _FLOOR_CODE and current_map[x][y-1].tile_code == _WALL_CODE and _rand(100) < chance:
                         current_map[x][y - 1] = Tile(_DOOR_CODE, get_highest_key_level_around(x, y-1))
                     # down
-                    if current_map[x][y+2].char == _FLOOR_CODE and current_map[x][y+1].char == _WALL_CODE and _rand(100) < chance:
+                    if current_map[x][y+2].tile_code == _FLOOR_CODE and current_map[x][y+1].tile_code == _WALL_CODE and _rand(100) < chance:
                         current_map[x][y + 1] = Tile(_DOOR_CODE, get_highest_key_level_around(x, y+1))
                     # right
-                    if current_map[x+2][y].char == _FLOOR_CODE and current_map[x+1][y].char == _WALL_CODE and _rand(100) < chance:
+                    if current_map[x+2][y].tile_code == _FLOOR_CODE and current_map[x+1][y].tile_code == _WALL_CODE and _rand(100) < chance:
                         current_map[x+1][y] = Tile(_DOOR_CODE, get_highest_key_level_around(x+1, y))
                     # left
-                    if current_map[x-2][y].char == _FLOOR_CODE and current_map[x-1][y].char == _WALL_CODE and _rand(100) < chance:
+                    if current_map[x-2][y].tile_code == _FLOOR_CODE and current_map[x-1][y].tile_code == _WALL_CODE and _rand(100) < chance:
                         current_map[x-1][y] = Tile(_DOOR_CODE, get_highest_key_level_around(x-1, y))
 
 
@@ -538,7 +527,7 @@ def remove_some_random_doors():
     global current_map
     for x in range (_MAP_WIDTH):
         for y in range(_MAP_HEIGHT):
-            if current_map[x][y].char == _DOOR_CODE and _rand(100) < 60 and not is_neighbouring_with_different_key_levels(x, y):
+            if current_map[x][y].tile_code == _DOOR_CODE and _rand(100) < 60 and not is_neighbouring_with_different_key_levels(x, y):
                 current_map[x][y] = Tile(_FLOOR_CODE)
 
 
@@ -557,24 +546,28 @@ def placeInitialRoom():
 def place_stairs():
     global current_map
     x = y = 0
-    while (current_map[x][y].char != _FLOOR_CODE or current_map[x][y].key_level != 0 or count_walls_around(x, y) > 3):
+    while (current_map[x][y].tile_code != _FLOOR_CODE or current_map[x][y].key_level != 0 or count_walls_around(x, y) > 3):
         x = _random(2, _MAP_WIDTH - 2)
         y = _random(2, _MAP_HEIGHT - 2)
     put_single_tile(x, y, _DOWN_STAIRS_CODE, 0)
-    print('{},{} DSTAIRS'.format(x, y))
 
-    while (current_map[x][y].char != _FLOOR_CODE or current_map[x][y].key_level != max_key_level or count_walls_around(x, y) > 3):
+    attempt = 0
+    key_level_to_place_downstair = max_key_level
+    while (current_map[x][y].tile_code != _FLOOR_CODE or current_map[x][y].key_level != key_level_to_place_downstair or count_walls_around(x, y) > 3):
         x = _random(2, _MAP_WIDTH - 2)
         y = _random(2, _MAP_HEIGHT - 2)
+        attempt += 1
+        if attempt > 250:
+            key_level_to_place_downstair -= 1
+            attempt = 0
     put_single_tile(x, y, _UP_STAIRS_CODE, 2)
-    print('{},{} USTAIRS'.format(x, y))
 
 
 def update_doors_key_levels():  # shitty workaround
     global current_map
     for x in range(len(current_map)):
         for y in range(len(current_map[0])):
-            if current_map[x][y].char == _DOOR_CODE:
+            if current_map[x][y].tile_code == _DOOR_CODE:
                 if is_neighbouring_with_different_key_levels(x, y):
                     current_map[x][y].key_level = get_highest_key_level_around(x, y)
                 else:
@@ -583,12 +576,12 @@ def update_doors_key_levels():  # shitty workaround
 
 def polish_deadend_corridors():
     def maybe_purge(x, y): #  yep, this is a def inside of a def. WHAT A SHITTY-WITTY CODE, OH MY!
-        if current_map[x][y].char == _FLOOR_CODE and count_adjacent_walls(x, y) == 3:
+        if current_map[x][y].tile_code == _FLOOR_CODE and count_adjacent_walls(x, y) == 3:
             if count_diag_walls(x, y) == 4:
                 if _random(0, 10) < 5:
                     put_single_tile(x, y, _WALL_CODE)
-            elif _random(0, 10) < 1:
-                put_single_tile(x, y, _WALL_CODE)
+            # elif _random(0, 15) < 1:
+            #     put_single_tile(x, y, _WALL_CODE)
 
     global current_map
     for x in range(0, _MAP_WIDTH):
@@ -609,7 +602,7 @@ def purge_bad_doors():
     global current_map
     for x in range(0, _MAP_WIDTH):
         for y in range(0, _MAP_HEIGHT):
-            if current_map[x][y].char == _DOOR_CODE:
+            if current_map[x][y].tile_code == _DOOR_CODE:
                 adj_walls = count_adjacent_walls(x, y)
                 if adj_walls != 2:
                     put_single_tile(x, y, _FLOOR_CODE)
@@ -652,7 +645,7 @@ def generateDungeon(mapw, maph, max_key_levels=2):
 
         total_count += 1
 
-        draw_shit(current_map)  # <----- DELETE IT
+    # draw_shit(current_map)  # <----- DELETE IT
 
     try_add_more_doors()
 
@@ -672,48 +665,48 @@ def generateDungeon(mapw, maph, max_key_levels=2):
 ##################################################################################################
 # DELETE EVERYTHING BELOW:
 
-def draw_shit(current_map):
-    import ConsoleWrapper as CW
-    import time
-
-    _WALL_CODE = chr(177)
-    _FLOOR_CODE = '.'
-    _CLDOOR_CODE = '+'
-    _OPDOOR_CODE = '\\'
-
-
-    tile_names = {
-        'wall': _WALL_CODE,
-        'floor': _FLOOR_CODE,
-        'door': _CLDOOR_CODE,
-        'ustairs' : '>',
-        'dstairs': '<',
-        'debugtile': '#'
-    }
-
-
-    tile_colors = {
-        _WALL_CODE: (128, 128, 128),
-        _FLOOR_CODE: (64, 64, 64),
-        _CLDOOR_CODE: (128, 128, 128),
-        _OPDOOR_CODE: (128, 64, 0)
-    }
-
-    key_levels = {
-        0: (128, 128, 128),
-        1: (0, 128, 0),
-        2: (128, 0, 0),
-        3: (128, 0, 128)
-    }
-
-    for i in range(_MAP_WIDTH):
-        for j in range(_MAP_HEIGHT):
-            tile_char = tile_names[current_map[i][j].char]
-            # CW.setForegroundColor(tile_colors[tile_char])
-            CW.setForegroundColor(key_levels[current_map[i][j].key_level])
-            if current_map[i][j].char == 'debugtile':
-                CW.setForegroundColor(255, 0, 255)
-            CW.putChar(tile_char, i, j)
-
-    CW.flushConsole()
-    # time.sleep(0.1)
+# def draw_shit(current_map):
+#     import ConsoleWrapper as CW
+#     import time
+#
+#     _WALL_CODE = chr(177)
+#     _FLOOR_CODE = '.'
+#     _CLDOOR_CODE = '+'
+#     _OPDOOR_CODE = '\\'
+#
+#
+#     tile_names = {
+#         'wall': _WALL_CODE,
+#         'floor': _FLOOR_CODE,
+#         'door': _CLDOOR_CODE,
+#         'ustairs' : '>',
+#         'dstairs': '<',
+#         'debugtile': '#'
+#     }
+#
+#
+#     tile_colors = {
+#         _WALL_CODE: (128, 128, 128),
+#         _FLOOR_CODE: (64, 64, 64),
+#         _CLDOOR_CODE: (128, 128, 128),
+#         _OPDOOR_CODE: (128, 64, 0)
+#     }
+#
+#     key_levels = {
+#         0: (128, 128, 128),
+#         1: (0, 128, 0),
+#         2: (128, 0, 0),
+#         3: (128, 0, 128)
+#     }
+#
+#     for i in range(_MAP_WIDTH):
+#         for j in range(_MAP_HEIGHT):
+#             tile_char = tile_names[current_map[i][j].tile_code]
+#             # CW.setForegroundColor(tile_colors[tile_char])
+#             CW.setForegroundColor(key_levels[current_map[i][j].key_level])
+#             if current_map[i][j].tile_code == 'debugtile':
+#                 CW.setForegroundColor(255, 0, 255)
+#             CW.putChar(tile_char, i, j)
+#
+#     CW.flushConsole()
+#     # time.sleep(0.1)
