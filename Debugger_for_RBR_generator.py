@@ -12,8 +12,8 @@ tile_names = {
     'wall': _WALL_CODE,
     'floor': _FLOOR_CODE,
     'door': _CLDOOR_CODE,
-    'ustairs': '>',
-    'dstairs': '<',
+    'ustairs': '<',
+    'dstairs': '>',
     'debugtile': '#'
 }
 
@@ -35,10 +35,10 @@ def debug_RBR():
     RBRDungeonGenerator.setRandomSeed(int(time.time()))
     while not CW.isWindowClosed():
         key_pressed_text = ''
-        map = RBRDungeonGenerator.generateDungeon(SCREEN_WIDTH, SCREEN_HEIGHT)
+        map = RBRDungeonGenerator.generateDungeon(SCREEN_WIDTH, 21)
 
         for i in range(SCREEN_WIDTH):
-            for j in range(SCREEN_HEIGHT):
+            for j in range(21):
                 tile_char = tile_names[map[i][j].tile_code]
                 #CW.setForegroundColor(tile_colors[tile_char])
                 CW.setForegroundColor(key_levels[map[i][j].key_level])
